@@ -11,6 +11,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_compass:
+    git:
+      ref: feat/fallback-to-magnetic-sensor
+      url: https://github.com/Xennis/flutter_compass.git
+  flutter_map: ^0.10.1
+  location: ^3.0.2
 
 dev_dependencies:
   flutter_test:
