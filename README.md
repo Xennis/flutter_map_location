@@ -1,5 +1,7 @@
 # flutter_map_location
 
+[![Flutter](https://github.com/Xennis/flutter_map_location/workflows/Flutter/badge.svg?branch=master&event=push)](https://github.com/Xennis/flutter_map_location/actions?query=workflow%3A%22Flutter%22+event%3Apush+branch%3Amaster)
+
 A new Flutter package project.
 
 ## Getting Started
