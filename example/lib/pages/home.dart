@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
-import 'package:flutter_map_user_location/flutter_map_user_location.dart';
+import 'package:flutter_map_location/flutter_map_location.dart';
 
 class HomePage extends StatelessWidget {
   final MapController mapController = MapController();
@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('User Location Examples'),
+          title: const Text('Location Examples'),
         ),
         body: Center(
           child: Column(
@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget {
                   mapController: mapController,
                   options: MapOptions(
                     plugins: <MapPlugin>[
-                      UserLocationPlugin(),
+                      LocationPlugin(),
                     ],
                   ),
                   layers: <LayerOptions>[
@@ -32,7 +32,7 @@ class HomePage extends StatelessWidget {
                       tileProvider: NonCachingNetworkTileProvider(),
                     ),
                     MarkerLayerOptions(markers: userLocationMarkers),
-                    UserLocationOptions(
+                    LocationOptions(
                       markers: userLocationMarkers,
                       onLocationUpdate: (LatLng loc) {
                         print('Location updated: $loc');
@@ -44,7 +44,7 @@ class HomePage extends StatelessWidget {
                         mapController?.move(loc, 16.0);
                       },
                       buttonBuilder: (BuildContext context,
-                          ValueNotifier<UserLocationServiceStatus> status,
+                          ValueNotifier<LocationServiceStatus> status,
                           Function onPressed) {
                         return Align(
                           alignment: Alignment.bottomRight,
@@ -53,17 +53,16 @@ class HomePage extends StatelessWidget {
                                 bottom: 16.0, right: 16.0),
                             child: FloatingActionButton(
                                 child: ValueListenableBuilder<
-                                        UserLocationServiceStatus>(
+                                        LocationServiceStatus>(
                                     valueListenable: status,
                                     builder: (BuildContext context,
-                                        UserLocationServiceStatus value,
+                                        LocationServiceStatus value,
                                         Widget child) {
                                       switch (value) {
-                                        case UserLocationServiceStatus.disabled:
-                                        case UserLocationServiceStatus
+                                        case LocationServiceStatus.disabled:
+                                        case LocationServiceStatus
                                             .permissionDenied:
-                                        case UserLocationServiceStatus
-                                            .unsubscribed:
+                                        case LocationServiceStatus.unsubscribed:
                                           return const Icon(
                                             Icons.location_disabled,
                                             color: Colors.white,

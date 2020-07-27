@@ -1,16 +1,15 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 double _degree2Radian(double degree) {
   return degree * pi / 180.0;
 }
 
-class UserLocationMarker extends StatelessWidget {
-  const UserLocationMarker({Key key, this.heading}) : super(key: key);
+class LocationMarker extends StatelessWidget {
+  const LocationMarker({Key key, this.heading}) : super(key: key);
 
-  static final CustomPainter headingerPainter = UserLocationMarkerHeading();
+  static final CustomPainter headingerPainter = LocationMarkerHeading();
   final ValueNotifier<double> heading;
 
   @override
@@ -55,7 +54,7 @@ class UserLocationMarker extends StatelessWidget {
   }
 }
 
-class UserLocationMarkerHeading extends CustomPainter {
+class LocationMarkerHeading extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Rect rect = Rect.fromCircle(
