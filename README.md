@@ -1,16 +1,25 @@
-# flutter_map_location
+# Flutter Map – Location plugin
 
 [![Flutter](https://github.com/Xennis/flutter_map_location/workflows/Flutter/badge.svg?branch=master&event=push)](https://github.com/Xennis/flutter_map_location/actions?query=workflow%3A%22Flutter%22+event%3Apush+branch%3Amaster)
 
-A new Flutter package project.
+A [flutter_map](https://pub.dev/packages/flutter_map) plugin to request and display the users location and heading on the map.
 
-## Getting Started
+## Usage
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+TODO
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+## Demo / example
+
+A working example can be found in the `example/` directory. It contains a page with the default settings:
+
+![Default example](example/default.png)
+
+... and one with customized button and marker:
+
+![Custom example](example/custom.png)
+
+(Map attribution: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors)
+
+## Credits
+
+The plugin is inspired by [user_location_plugin](https://github.com/igaurab/user_location_plugin) by [igaurab](https://github.com/igaurab).
