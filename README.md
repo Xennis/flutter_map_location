@@ -1,4 +1,4 @@
-# flutter_map_user_location
+# flutter_map_location
 
 A new Flutter package project.
 

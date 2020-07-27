@@ -4,7 +4,7 @@ import 'package:flutter_map/plugin_api.dart';
 
 import 'package:latlong/latlong.dart';
 
-enum UserLocationServiceStatus {
+enum LocationServiceStatus {
   disabled,
   permissionDenied,
   subscribed,
@@ -12,14 +12,14 @@ enum UserLocationServiceStatus {
   unsubscribed,
 }
 
-typedef UserLocationButtonBuilder = Widget Function(BuildContext context,
-    ValueNotifier<UserLocationServiceStatus>, Function onPressed);
+typedef LocationButtonBuilder = Widget Function(BuildContext context,
+    ValueNotifier<LocationServiceStatus>, Function onPressed);
 
-typedef UserLocationMarkerBuilder = Marker Function(
+typedef LocationMarkerBuilder = Marker Function(
     BuildContext context, LatLng point, ValueNotifier<double> heading);
 
-class UserLocationOptions extends LayerOptions {
-  UserLocationOptions(
+class LocationOptions extends LayerOptions {
+  LocationOptions(
       {@required this.markers,
       this.onLocationUpdate,
       this.onLocationRequested,
@@ -31,8 +31,8 @@ class UserLocationOptions extends LayerOptions {
 
   final void Function(LatLng) onLocationUpdate;
   final void Function(LatLng) onLocationRequested;
-  final UserLocationButtonBuilder buttonBuilder;
-  final UserLocationMarkerBuilder markerBuilder;
+  final LocationButtonBuilder buttonBuilder;
+  final LocationMarkerBuilder markerBuilder;
   final int updateIntervalMs;
   List<Marker> markers;
 }

@@ -1,5 +1,5 @@
-name: flutter_map_user_location_example
-description: Demonstrates how to use the flutter_map_user_location plugin.
+name: flutter_map_location_example
+description: Demonstrates how to use the flutter_map_location plugin.
 
 dependencies:
   flutter:
@@ -8,7 +8,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_map_user_location:
+  flutter_map_location:
     path: ../
 
 flutter:
