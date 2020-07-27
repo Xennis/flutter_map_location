@@ -16,5 +16,5 @@ jobs:
       run: dart format --set-exit-if-changed .
     - name: Run linter
       run: flutter analyze .
-    #- name: Run tests
-    #  run: flutter test
+    - name: Run tests
+      run: flutter test .
