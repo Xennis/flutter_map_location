@@ -29,7 +29,6 @@ class HomePage extends StatelessWidget {
                       urlTemplate:
                           'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                       subdomains: <String>['a', 'b', 'c'],
-                      tileProvider: NonCachingNetworkTileProvider(),
                     ),
                     MarkerLayerOptions(markers: userLocationMarkers),
                     LocationOptions(
