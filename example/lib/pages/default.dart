@@ -3,7 +3,16 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
 
-class HomePage extends StatelessWidget {
+import '../widgets/drawer.dart';
+
+class DefaultPage extends StatefulWidget {
+  static const String route = '/';
+
+  @override
+  _DefaultPageState createState() => _DefaultPageState();
+}
+
+class _DefaultPageState extends State<DefaultPage> {
   final MapController mapController = MapController();
   final List<Marker> userLocationMarkers = <Marker>[];
 
@@ -11,8 +20,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Location Examples'),
+          title: const Text('Default'),
         ),
+        drawer: buildDrawer(context, DefaultPage.route),
         body: Center(
           child: Column(
             children: <Widget>[
