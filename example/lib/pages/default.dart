@@ -13,6 +13,7 @@ class DefaultPage extends StatefulWidget {
 }
 
 class _DefaultPageState extends State<DefaultPage> {
+  // USAGE NOTE 1: Add a controler and marker list:
   final MapController mapController = MapController();
   final List<Marker> userLocationMarkers = <Marker>[];
 
@@ -24,74 +25,67 @@ class _DefaultPageState extends State<DefaultPage> {
         ),
         drawer: buildDrawer(context, DefaultPage.route),
         body: Center(
-          child: Column(
-            children: <Widget>[
-              Flexible(
-                child: FlutterMap(
-                  mapController: mapController,
-                  options: MapOptions(
-                    plugins: <MapPlugin>[
-                      LocationPlugin(),
-                    ],
-                  ),
-                  layers: <LayerOptions>[
-                    TileLayerOptions(
-                      urlTemplate:
-                          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      subdomains: <String>['a', 'b', 'c'],
+          child: FlutterMap(
+            mapController: mapController,
+            options: MapOptions(
+              plugins: <MapPlugin>[
+                // USAGE NOTE 2: Add the plugin
+                LocationPlugin(),
+              ],
+            ),
+            layers: <LayerOptions>[
+              TileLayerOptions(
+                urlTemplate:
+                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: <String>['a', 'b', 'c'],
+              ),
+              // USAGE NOTE 3: Add the layer for the marker
+              MarkerLayerOptions(markers: userLocationMarkers),
+              // USAGE NOTE 4: Add the options for the plugin
+              LocationOptions(
+                markers: userLocationMarkers,
+                onLocationUpdate: (LatLng loc) {
+                  print('Location updated: $loc');
+                },
+                onLocationRequested: (LatLng loc) {
+                  if (loc == null) {
+                    return;
+                  }
+                  mapController?.move(loc, 16.0);
+                },
+                buttonBuilder: (BuildContext context,
+                    ValueNotifier<LocationServiceStatus> status,
+                    Function onPressed) {
+                  return Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0, right: 16.0),
+                      child: FloatingActionButton(
+                          child: ValueListenableBuilder<LocationServiceStatus>(
+                              valueListenable: status,
+                              builder: (BuildContext context,
+                                  LocationServiceStatus value, Widget child) {
+                                switch (value) {
+                                  case LocationServiceStatus.disabled:
+                                  case LocationServiceStatus.permissionDenied:
+                                  case LocationServiceStatus.unsubscribed:
+                                    return const Icon(
+                                      Icons.location_disabled,
+                                      color: Colors.white,
+                                    );
+                                    break;
+                                  default:
+                                    return const Icon(
+                                      Icons.location_searching,
+                                      color: Colors.white,
+                                    );
+                                    break;
+                                }
+                              }),
+                          onPressed: () => onPressed()),
                     ),
-                    MarkerLayerOptions(markers: userLocationMarkers),
-                    LocationOptions(
-                      markers: userLocationMarkers,
-                      onLocationUpdate: (LatLng loc) {
-                        print('Location updated: $loc');
-                      },
-                      onLocationRequested: (LatLng loc) {
-                        if (loc == null) {
-                          return;
-                        }
-                        mapController?.move(loc, 16.0);
-                      },
-                      buttonBuilder: (BuildContext context,
-                          ValueNotifier<LocationServiceStatus> status,
-                          Function onPressed) {
-                        return Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                bottom: 16.0, right: 16.0),
-                            child: FloatingActionButton(
-                                child: ValueListenableBuilder<
-                                        LocationServiceStatus>(
-                                    valueListenable: status,
-                                    builder: (BuildContext context,
-                                        LocationServiceStatus value,
-                                        Widget child) {
-                                      switch (value) {
-                                        case LocationServiceStatus.disabled:
-                                        case LocationServiceStatus
-                                            .permissionDenied:
-                                        case LocationServiceStatus.unsubscribed:
-                                          return const Icon(
-                                            Icons.location_disabled,
-                                            color: Colors.white,
-                                          );
-                                          break;
-                                        default:
-                                          return const Icon(
-                                            Icons.location_searching,
-                                            color: Colors.white,
-                                          );
-                                          break;
-                                      }
-                                    }),
-                                onPressed: () => onPressed()),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ],
           ),
