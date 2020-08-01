@@ -1,6 +1,6 @@
 # Flutter Map – Location plugin
 
-[![Flutter](https://github.com/Xennis/flutter_map_location/workflows/Flutter/badge.svg?branch=master&event=push)](https://github.com/Xennis/flutter_map_location/actions?query=workflow%3A%22Flutter%22+event%3Apush+branch%3Amaster)
+[![Flutter](https://github.com/Xennis/flutter_map_location/workflows/Flutter/badge.svg?branch=master&event=push)](https://github.com/Xennis/flutter_map_location/actions?query=workflow%3A%22Flutter%22+event%3Apush+branch%3Amaster) [![Pub](https://img.shields.io/pub/v/flutter_map_location.svg)](https://pub.dev/packages/flutter_map_location)
 
 A [flutter_map](https://pub.dev/packages/flutter_map) plugin to request and display the users location and heading on the map. The core features of the plugin are:
 
