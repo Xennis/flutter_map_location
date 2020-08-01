@@ -10,10 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_compass:
-    git:
-      ref: 4f10681292beba72af09e4da2072b8ed2517de8e
-      url: https://github.com/hemanthrajv/flutter_compass.git
+  flutter_compass: ^0.4.2+1
   flutter_map: ^0.10.1
   latlong: ^0.6.1
   location: ^3.0.2
