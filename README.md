@@ -6,7 +6,7 @@ A [flutter_map](https://pub.dev/packages/flutter_map) plugin to request and disp
 
 * Customization: The location button and marker can be completly customized.
 * Energy efficiency: The location service is turned off if the app runs in the background.
-* Usability: Developers are empowered to ensure a good [user experience](#User experience).
+* Usability: Developers are empowered to ensure a good [user experience](#User-experience).
 
 ## User experience
 
@@ -50,17 +50,17 @@ See [reference example code](https://github.com/Xennis/flutter_map_location/blob
 
 ## Usage
 
-Look at the [default example](example/lib/pages/default.dart) and the notes inside the code. That's a working example.
+Look at the [default example](https://github.com/Xennis/flutter_map_location/blob/master/example/lib/pages/default.dart) and the notes inside the code. That's a working example.
 
 ## Demo / example
 
 A working example can be found in the `example/` directory. It contains a page with the default settings:
 
-![Default example](example/default.png)
+![Default example](https://raw.githubusercontent.com/Xennis/flutter_map_location/master/example/default.png)
 
 ... and one with customized button and marker:
 
-![Custom example](example/custom.png)
+![Custom example](https://raw.githubusercontent.com/Xennis/flutter_map_location/master/example/custom.png)
 
 (Map attribution: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors)
 
