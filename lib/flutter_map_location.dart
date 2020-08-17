@@ -4,3 +4,4 @@ export 'src/location_layer.dart';
 export 'src/location_marker.dart';
 export 'src/location_options.dart';
 export 'src/location_plugin.dart';
+export 'src/types.dart';

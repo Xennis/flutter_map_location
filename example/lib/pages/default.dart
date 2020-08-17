@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
 
 import '../widgets/drawer.dart';
@@ -44,14 +43,14 @@ class _DefaultPageState extends State<DefaultPage> {
               // USAGE NOTE 4: Add the options for the plugin
               LocationOptions(
                 markers: userLocationMarkers,
-                onLocationUpdate: (LatLng loc) {
-                  print('Location updated: $loc');
+                onLocationUpdate: (LatLngData ld) {
+                  print('Location updated: ${ld?.location}');
                 },
-                onLocationRequested: (LatLng loc) {
-                  if (loc == null) {
+                onLocationRequested: (LatLngData ld) {
+                  if (ld == null || ld.location == null) {
                     return;
                   }
-                  mapController?.move(loc, 16.0);
+                  mapController?.move(ld.location, 16.0);
                 },
                 buttonBuilder: (BuildContext context,
                     ValueNotifier<LocationServiceStatus> status,

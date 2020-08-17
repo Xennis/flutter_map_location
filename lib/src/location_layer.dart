@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_location/src/types.dart';
 import 'package:location/location.dart';
 import 'package:latlong/latlong.dart';
 
@@ -11,9 +12,9 @@ import 'location_marker.dart';
 import 'location_options.dart';
 
 LocationMarkerBuilder _defaultMarkerBuilder =
-    (BuildContext context, LatLng point, ValueNotifier<double> heading) {
+    (BuildContext context, LatLngData ld, ValueNotifier<double> heading) {
   return Marker(
-    point: point,
+    point: ld.location,
     builder: (_) => LocationMarker(heading: heading),
     height: 60.0,
     width: 60.0,
@@ -38,7 +39,8 @@ class _LocationLayerState extends State<LocationLayer>
   final Location _location = Location();
   final ValueNotifier<LocationServiceStatus> _serviceStatus =
       ValueNotifier<LocationServiceStatus>(null);
-  final ValueNotifier<LatLng> _lastLocation = ValueNotifier<LatLng>(null);
+  final ValueNotifier<LatLngData> _lastLocation =
+      ValueNotifier<LatLngData>(null);
   final ValueNotifier<double> _heading = ValueNotifier<double>(null);
 
   StreamSubscription<LocationData> _onLocationChangedSub;
@@ -54,12 +56,12 @@ class _LocationLayerState extends State<LocationLayer>
     _initOnLocationUpdateSubscription()
         .then((LocationServiceStatus status) => _serviceStatus.value = status);
     _lastLocation.addListener(() {
-      final LatLng loc = _lastLocation.value;
+      final LatLngData loc = _lastLocation.value;
       widget.options.onLocationUpdate?.call(loc);
       if (widget.options.markers.isNotEmpty) {
         widget.options.markers.removeLast();
       }
-      if (loc == null) {
+      if (loc == null || loc.location == null) {
         return;
       }
       widget.options.markers.add(widget.options.markerBuilder != null
@@ -157,9 +159,9 @@ class _LocationLayerState extends State<LocationLayer>
   }
 }
 
-LatLng _locationDataToLatLng(LocationData ld) {
+LatLngData _locationDataToLatLng(LocationData ld) {
   if (ld.latitude == null || ld.longitude == null) {
     return null;
   }
-  return LatLng(ld.latitude, ld.longitude);
+  return LatLngData(LatLng(ld.latitude, ld.longitude), ld.accuracy);
 }
