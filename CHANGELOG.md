@@ -1,4 +1,4 @@
-## Dev
+## 0.7.0
 
 * Show larger circle for inaccurate location.
 * Show heading for accurate location only.
