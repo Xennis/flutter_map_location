@@ -13,7 +13,7 @@ A [flutter_map](https://pub.dev/packages/flutter_map) plugin to request and disp
 Status
 
 * [x] The location button can be changed dependening on the location services status. For example also Google Maps shows a different icon if the location service is off.
-* [ ] The marker icon can be changed depending on the location accuracy.
+* [x] The marker icon can be changed depending on the location accuracy.
 * [x] It's possible to show the information (e.g. in form of a snackbar) to the user that the user location is outside of the map bounds.
 * [x] The location heading is also shown for devices without an gyroscope. We [patched flutter_compass](https://github.com/hemanthrajv/flutter_compass/pull/38) for that.
 

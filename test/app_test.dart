@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
+import 'package:flutter_map_location/src/types.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong/latlong.dart';
 
 void main() {
   testWidgets('Render app', (WidgetTester tester) async {
@@ -35,8 +35,8 @@ class _TestApp extends StatelessWidget {
               MarkerLayerOptions(markers: userLocationMarkers),
               LocationOptions(
                 markers: userLocationMarkers,
-                onLocationUpdate: (LatLng loc) {},
-                onLocationRequested: (LatLng loc) {},
+                onLocationUpdate: (LatLngData ld) {},
+                onLocationRequested: (LatLngData ld) {},
                 buttonBuilder: (BuildContext context,
                     ValueNotifier<LocationServiceStatus> status,
                     Function onPressed) {
