@@ -15,7 +15,7 @@ LocationMarkerBuilder _defaultMarkerBuilder =
     (BuildContext context, LatLngData ld, ValueNotifier<double> heading) {
   return Marker(
     point: ld.location,
-    builder: (_) => LocationMarker(heading: heading),
+    builder: (_) => LocationMarker(ld: ld, heading: heading),
     height: 60.0,
     width: 60.0,
   );

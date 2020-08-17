@@ -1,15 +1,17 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_map_location/src/types.dart';
 
 double _degree2Radian(double degree) {
   return degree * pi / 180.0;
 }
 
 class LocationMarker extends StatelessWidget {
-  const LocationMarker({Key key, this.heading}) : super(key: key);
+  const LocationMarker({Key key, this.ld, this.heading}) : super(key: key);
 
   static final CustomPainter headingerPainter = LocationMarkerHeading();
+  final LatLngData ld;
   final ValueNotifier<double> heading;
 
   @override
@@ -24,6 +26,12 @@ class LocationMarker extends StatelessWidget {
                   valueListenable: heading ?? ValueNotifier<double>(null),
                   builder: (BuildContext context, double value, Widget child) {
                     if (value == null) {
+                      return Container();
+                    }
+                    // Only display heading for an accurate location.
+                    if (ld == null ||
+                        ld.accuracy == null ||
+                        ld.accuracy > 30.0) {
                       return Container();
                     }
                     return Transform.rotate(
