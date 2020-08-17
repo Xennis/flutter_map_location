@@ -1,5 +1,7 @@
 ## Dev
 
+* Show larger circle for inaccurate location.
+* Show heading for accurate location only.
 * Add possiblity to change marker icon depending on the location accuracy.
 * BREAKING CHANGE: All options return the type `LatLngData` instead of `LatLng`.
 

@@ -13,11 +13,12 @@ import 'location_options.dart';
 
 LocationMarkerBuilder _defaultMarkerBuilder =
     (BuildContext context, LatLngData ld, ValueNotifier<double> heading) {
+  final double diameter = ld != null && ld.highAccurency() ? 60.0 : 120.0;
   return Marker(
     point: ld.location,
     builder: (_) => LocationMarker(ld: ld, heading: heading),
-    height: 60.0,
-    width: 60.0,
+    height: diameter,
+    width: diameter,
   );
 };
 

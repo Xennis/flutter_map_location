@@ -16,6 +16,7 @@ class LocationMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double diameter = ld != null && ld.highAccurency() ? 22.0 : 80.0;
     return Container(
       child: Column(
         children: <Widget>[
@@ -29,9 +30,7 @@ class LocationMarker extends StatelessWidget {
                       return Container();
                     }
                     // Only display heading for an accurate location.
-                    if (ld == null ||
-                        ld.accuracy == null ||
-                        ld.accuracy > 30.0) {
+                    if (ld == null || !ld.highAccurency()) {
                       return Container();
                     }
                     return Transform.rotate(
@@ -45,8 +44,8 @@ class LocationMarker extends StatelessWidget {
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.blue[300].withOpacity(0.7)),
-                height: 22.0,
-                width: 22.0,
+                height: diameter,
+                width: diameter,
               ),
               Container(
                 decoration: const BoxDecoration(
