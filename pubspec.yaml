@@ -10,10 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_compass: ^0.4.3
+  flutter_compass: ^0.5.0
   flutter_map: ^0.10.1+1
   latlong: ^0.6.1
-  location: ^3.0.2
+  location: ^3.1.0
 
 dev_dependencies:
   flutter_test:
