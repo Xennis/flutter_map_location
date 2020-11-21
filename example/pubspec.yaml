@@ -7,12 +7,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_map_location:
+    path: ../
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_map_location:
-    path: ../
 
 flutter:
   uses-material-design: true
