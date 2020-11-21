@@ -45,7 +45,7 @@ class _LocationLayerState extends State<LocationLayer>
   final ValueNotifier<double> _heading = ValueNotifier<double>(null);
 
   StreamSubscription<LocationData> _onLocationChangedSub;
-  StreamSubscription<double> _compassEventsSub;
+  StreamSubscription<CompassEvent> _compassEventsSub;
   bool _locationRequested = false;
 
   @override
@@ -153,8 +153,8 @@ class _LocationLayerState extends State<LocationLayer>
       _serviceStatus.value = LocationServiceStatus.unsubscribed;
     });
     await _compassEventsSub?.cancel();
-    _compassEventsSub = FlutterCompass.events.listen((double heading) {
-      _heading.value = heading;
+    _compassEventsSub = FlutterCompass.events.listen((CompassEvent event) {
+      _heading.value = event.heading;
     });
     return LocationServiceStatus.subscribed;
   }
