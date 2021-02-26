@@ -1,3 +1,7 @@
+## 0.7.0+2
+
+* Update dependencies
+
 ## 0.7.0+1
 
 * Update dependencies
