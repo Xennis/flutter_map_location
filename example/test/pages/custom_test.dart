@@ -9,6 +9,7 @@ import '../../lib/pages/custom.dart';
 void main() {
   testWidgets('Render CustomPage', (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(home: CustomPage()));
+    await tester.pumpAndSettle(const Duration(seconds: 5));
     expect(find.byType(FlutterMap), findsOneWidget);
     expect(find.byType(LocationLayer), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsOneWidget);
