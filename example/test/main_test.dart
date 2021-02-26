@@ -9,6 +9,7 @@ import '../lib/main.dart';
 void main() {
   testWidgets('Render app', (WidgetTester tester) async {
     await tester.pumpWidget(MyApp());
+    await tester.pumpAndSettle(const Duration(seconds: 5));
     expect(find.byType(FlutterMap), findsOneWidget);
     expect(find.byType(LocationLayer), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsOneWidget);

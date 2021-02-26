@@ -7,6 +7,8 @@ import 'package:flutter_map/flutter_map.dart';
 void main() {
   testWidgets('Render app', (WidgetTester tester) async {
     await tester.pumpWidget(_TestApp());
+    // See https://github.com/flutter/flutter/issues/11181#issuecomment-568737491
+    await tester.pumpAndSettle(const Duration(seconds: 5));
     expect(find.byType(FlutterMap), findsOneWidget);
     expect(find.byType(LocationLayer), findsOneWidget);
     expect(find.byType(FloatingActionButton), findsOneWidget);
