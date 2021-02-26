@@ -18,3 +18,5 @@ jobs:
       run: flutter analyze .
     - name: Run tests
       run: flutter test .
+    - name: Run publish dry-run
+      run: flutter pub publish --dry-run
