@@ -31,6 +31,7 @@ class _DefaultPageState extends State<DefaultPage> {
                 // USAGE NOTE 2: Add the plugin
                 LocationPlugin(),
               ],
+              interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
             ),
             layers: <LayerOptions>[
               TileLayerOptions(

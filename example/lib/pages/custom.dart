@@ -29,6 +29,7 @@ class _CustomPageState extends State<CustomPage> {
               plugins: <MapPlugin>[
                 LocationPlugin(),
               ],
+              interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
             ),
             layers: <LayerOptions>[
               TileLayerOptions(
