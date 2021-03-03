@@ -1,3 +1,7 @@
+## 0.7.1
+
+* Fix location marker is centered correctly (#29 by @sjmallon)
+
 ## 0.7.0+2
 
 * Update dependencies
