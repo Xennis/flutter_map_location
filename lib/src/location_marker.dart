@@ -19,6 +19,7 @@ class LocationMarker extends StatelessWidget {
     final double diameter = ld != null && ld.highAccurency() ? 22.0 : 80.0;
     return Container(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Stack(
             alignment: AlignmentDirectional.center,
