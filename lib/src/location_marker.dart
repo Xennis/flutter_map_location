@@ -16,7 +16,7 @@ class LocationMarker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double diameter = ld != null && ld.highAccurency() ? 22.0 : 80.0;
+    final double diameter = ld != null && ld.highAccuracy() ? 22.0 : 80.0;
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -31,7 +31,7 @@ class LocationMarker extends StatelessWidget {
                       return Container();
                     }
                     // Only display heading for an accurate location.
-                    if (ld == null || !ld.highAccurency()) {
+                    if (ld == null || !ld.highAccuracy()) {
                       return Container();
                     }
                     return Transform.rotate(
