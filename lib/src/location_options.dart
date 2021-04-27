@@ -24,7 +24,8 @@ class LocationOptions extends LayerOptions {
       this.onLocationRequested,
       @required this.buttonBuilder,
       this.markerBuilder,
-      this.updateIntervalMs = 1000})
+      this.updateIntervalMs = 1000,
+      this.initiallyRequest = false})
       : assert(markers != null, buttonBuilder != null),
         super();
 
@@ -33,5 +34,6 @@ class LocationOptions extends LayerOptions {
   final LocationButtonBuilder buttonBuilder;
   final LocationMarkerBuilder markerBuilder;
   final int updateIntervalMs;
+  final bool initiallyRequest;
   List<Marker> markers;
 }
