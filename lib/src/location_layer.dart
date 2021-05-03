@@ -19,6 +19,7 @@ LocationMarkerBuilder _defaultMarkerBuilder =
     builder: (_) => LocationMarker(ld: ld, heading: heading),
     height: diameter,
     width: diameter,
+    rotate: false,
   );
 };
 

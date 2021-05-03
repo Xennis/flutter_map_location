@@ -29,15 +29,16 @@ class _CustomPageState extends State<CustomPage> {
               plugins: <MapPlugin>[
                 LocationPlugin(),
               ],
-              interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-            ),
+            ),    
             layers: <LayerOptions>[
               TileLayerOptions(
                 urlTemplate:
                     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: <String>['a', 'b', 'c'],
               ),
-              MarkerLayerOptions(markers: userLocationMarkers),
+            ],
+            nonRotatedLayers: <LayerOptions>[
+                MarkerLayerOptions(markers: userLocationMarkers),
               LocationOptions(
                 markers: userLocationMarkers,
                 onLocationUpdate: (LatLngData ld) {

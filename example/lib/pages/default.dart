@@ -31,7 +31,6 @@ class _DefaultPageState extends State<DefaultPage> {
                 // USAGE NOTE 2: Add the plugin
                 LocationPlugin(),
               ],
-              interactiveFlags: InteractiveFlag.all & ~InteractiveFlag.rotate,
             ),
             layers: <LayerOptions>[
               TileLayerOptions(
@@ -41,6 +40,8 @@ class _DefaultPageState extends State<DefaultPage> {
               ),
               // USAGE NOTE 3: Add the layer for the marker
               MarkerLayerOptions(markers: userLocationMarkers),
+            ],
+            nonRotatedLayers: <LayerOptions>[
               // USAGE NOTE 4: Add the options for the plugin
               LocationOptions(
                 markers: userLocationMarkers,
