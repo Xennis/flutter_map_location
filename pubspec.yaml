@@ -14,7 +14,8 @@ dependencies:
   flutter_map:
     git:
       url: https://github.com/fleaflet/flutter_map.git
-      ref: 38d9047ac6daff0948f70cffe1bba5132da0d170
+      # Do not upgrade further because of https://github.com/fleaflet/flutter_map/issues/887
+      ref: f9ad2881d302b4a3b5b25f207793ad9f4b961ad3
   latlong2: ^0.8.0
   location: ^4.1.1
 
