@@ -1,4 +1,4 @@
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 class LatLngData {
   const LatLngData(this.location, this.accuracy);
@@ -8,7 +8,7 @@ class LatLngData {
   /// Estimated horizontal accuracy, radial, in meters.
   final double accuracy;
 
-  bool highAccurency() {
+  bool highAccuracy() {
     return !(accuracy == null || accuracy <= 0.0 || accuracy > 30.0);
   }
 }

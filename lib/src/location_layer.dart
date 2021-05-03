@@ -5,15 +5,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_location/src/types.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:location/location.dart';
-import 'package:latlong/latlong.dart';
 
 import 'location_marker.dart';
 import 'location_options.dart';
 
 LocationMarkerBuilder _defaultMarkerBuilder =
     (BuildContext context, LatLngData ld, ValueNotifier<double> heading) {
-  final double diameter = ld != null && ld.highAccurency() ? 60.0 : 120.0;
+  final double diameter = ld != null && ld.highAccuracy() ? 60.0 : 120.0;
   return Marker(
     point: ld.location,
     builder: (_) => LocationMarker(ld: ld, heading: heading),
