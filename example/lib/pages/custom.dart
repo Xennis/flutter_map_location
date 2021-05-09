@@ -13,7 +13,6 @@ class CustomPage extends StatefulWidget {
 
 class _CustomPageState extends State<CustomPage> {
   final MapController mapController = MapController();
-  final List<Marker> userLocationMarkers = <Marker>[];
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +28,7 @@ class _CustomPageState extends State<CustomPage> {
               plugins: <MapPlugin>[
                 LocationPlugin(),
               ],
-            ),    
+            ),
             layers: <LayerOptions>[
               TileLayerOptions(
                 urlTemplate:
@@ -38,11 +37,10 @@ class _CustomPageState extends State<CustomPage> {
               ),
             ],
             nonRotatedLayers: <LayerOptions>[
-                MarkerLayerOptions(markers: userLocationMarkers),
               LocationOptions(
-                markers: userLocationMarkers,
                 onLocationUpdate: (LatLngData ld) {
-                  print('Location updated: ${ld?.location}');
+                  print(
+                      'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
                 },
                 onLocationRequested: (LatLngData ld) {
                   if (ld == null || ld.location == null) {
