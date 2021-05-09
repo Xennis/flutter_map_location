@@ -1,3 +1,7 @@
+## 0.8.0
+
+* BREAKING CHANGE: Integrated the marker layer into the plugin. The option `markers` is removed. A `MarkerLayerOptions` outside of the plugin is not needed anymore. See update example for usage.
+
 ## 0.7.1+2
 
 * Update dependencies
