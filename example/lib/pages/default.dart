@@ -14,7 +14,6 @@ class DefaultPage extends StatefulWidget {
 class _DefaultPageState extends State<DefaultPage> {
   // USAGE NOTE 1: Add a controler and marker list:
   final MapController mapController = MapController();
-  final List<Marker> userLocationMarkers = <Marker>[];
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +38,11 @@ class _DefaultPageState extends State<DefaultPage> {
                     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                 subdomains: <String>['a', 'b', 'c'],
               ),
-              // USAGE NOTE 3: Add the layer for the marker
-              MarkerLayerOptions(markers: userLocationMarkers),
-              // USAGE NOTE 4: Add the options for the plugin
+              // USAGE NOTE 3: Add the options for the plugin
               LocationOptions(
-                markers: userLocationMarkers,
                 onLocationUpdate: (LatLngData ld) {
-                  print('Location updated: ${ld?.location}');
+                  print(
+                      'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
                 },
                 onLocationRequested: (LatLngData ld) {
                   if (ld == null || ld.location == null) {
