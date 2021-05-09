@@ -29,7 +29,7 @@ class LocationLayer extends StatefulWidget {
 
   final LocationOptions options;
   final MapState map;
-  final Stream<void> stream;
+  final Stream<Null> stream;
 
   @override
   _LocationLayerState createState() => _LocationLayerState();
@@ -59,19 +59,14 @@ class _LocationLayerState extends State<LocationLayer>
     _lastLocation.addListener(() {
       final LatLngData loc = _lastLocation.value;
       widget.options.onLocationUpdate?.call(loc);
-      if (widget.options.markers.isNotEmpty) {
-        widget.options.markers.removeLast();
-      }
       if (loc == null || loc.location == null) {
         return;
       }
-      widget.options.markers.add(widget.options.markerBuilder != null
-          ? widget.options.markerBuilder(context, loc, _heading)
-          : _defaultMarkerBuilder(context, loc, _heading));
       if (_locationRequested) {
         _locationRequested = false;
         widget.options.onLocationRequested?.call(loc);
       }
+      //setState(() {});
     });
   }
 
@@ -111,23 +106,42 @@ class _LocationLayerState extends State<LocationLayer>
 
   @override
   Widget build(BuildContext context) {
-    return widget.options.buttonBuilder(context, _serviceStatus, () async {
-      if (_serviceStatus?.value == LocationServiceStatus.disabled) {
-        if (!await _location.requestService()) {
-          return;
-        }
-        _serviceStatus.value = null;
-      }
-      if (_serviceStatus?.value != LocationServiceStatus.subscribed ||
-          _lastLocation?.value == null ||
-          !await _location.serviceEnabled()) {
-        _initOnLocationUpdateSubscription().then(
-            (LocationServiceStatus value) => _serviceStatus.value = value);
-        _locationRequested = true;
-      } else {
-        widget.options.onLocationRequested?.call(_lastLocation.value);
-      }
-    });
+    return Container(
+        child: Stack(
+      children: <Widget>[
+        ValueListenableBuilder<LatLngData>(
+            valueListenable: _lastLocation,
+            builder: (BuildContext context, LatLngData ld, Widget child) {
+              if (ld?.location == null) {
+                return Container();
+              }
+              final Marker marker = widget.options.markerBuilder != null
+                  ? widget.options
+                      .markerBuilder(context, _lastLocation.value, _heading)
+                  : _defaultMarkerBuilder(
+                      context, _lastLocation.value, _heading);
+              return MarkerLayerWidget(
+                  options: MarkerLayerOptions(markers: <Marker>[marker]));
+            }),
+        widget.options.buttonBuilder(context, _serviceStatus, () async {
+          if (_serviceStatus?.value == LocationServiceStatus.disabled) {
+            if (!await _location.requestService()) {
+              return;
+            }
+            _serviceStatus.value = null;
+          }
+          if (_serviceStatus?.value != LocationServiceStatus.subscribed ||
+              _lastLocation?.value == null ||
+              !await _location.serviceEnabled()) {
+            _initOnLocationUpdateSubscription().then(
+                (LocationServiceStatus value) => _serviceStatus.value = value);
+            _locationRequested = true;
+          } else {
+            widget.options.onLocationRequested?.call(_lastLocation.value);
+          }
+        })
+      ],
+    ));
   }
 
   Future<LocationServiceStatus> _initOnLocationUpdateSubscription() async {
