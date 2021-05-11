@@ -1,6 +1,6 @@
 name: flutter_map_location
 description: flutter_map plugin to request and display the users location and heading on the map.
-version: 0.8.0
+version: 0.9.0
 homepage: https://github.com/Xennis/flutter_map_location
 
 environment:
