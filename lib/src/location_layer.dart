@@ -5,8 +5,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_location/src/types.dart';
-import 'package:location/location.dart';
 import 'package:latlong/latlong.dart';
+import 'package:location/location.dart';
 
 import 'location_marker.dart';
 import 'location_options.dart';
@@ -53,9 +53,11 @@ class _LocationLayerState extends State<LocationLayer>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _location.changeSettings(interval: widget.options.updateIntervalMs);
-    _locationRequested = true;
-    _initOnLocationUpdateSubscription()
-        .then((LocationServiceStatus status) => _serviceStatus.value = status);
+    if (widget.options.initiallyRequest) {
+      _locationRequested = true;
+      _initOnLocationUpdateSubscription().then(
+          (LocationServiceStatus status) => _serviceStatus.value = status);
+    }
     _lastLocation.addListener(() {
       final LatLngData loc = _lastLocation.value;
       widget.options.onLocationUpdate?.call(loc);
@@ -133,7 +135,7 @@ class _LocationLayerState extends State<LocationLayer>
           if (_serviceStatus?.value != LocationServiceStatus.subscribed ||
               _lastLocation?.value == null ||
               !await _location.serviceEnabled()) {
-            _initOnLocationUpdateSubscription().then(
+            _initOnLocationUpdateSubscription(forceRequestLocation: true).then(
                 (LocationServiceStatus value) => _serviceStatus.value = value);
             _locationRequested = true;
           } else {
@@ -144,15 +146,18 @@ class _LocationLayerState extends State<LocationLayer>
     ));
   }
 
-  Future<LocationServiceStatus> _initOnLocationUpdateSubscription() async {
+  Future<LocationServiceStatus> _initOnLocationUpdateSubscription(
+      {bool forceRequestLocation = false}) async {
     if (!await _location.serviceEnabled()) {
       _lastLocation.value = null;
       return LocationServiceStatus.disabled;
     }
     if (await _location.hasPermission() == PermissionStatus.denied) {
-      if (await _location.requestPermission() != PermissionStatus.granted) {
-        _lastLocation.value = null;
-        return LocationServiceStatus.permissionDenied;
+      if (widget.options.initiallyRequest || forceRequestLocation) {
+        if (await _location.requestPermission() != PermissionStatus.granted) {
+          _lastLocation.value = null;
+          return LocationServiceStatus.permissionDenied;
+        }
       }
     }
     await _onLocationChangedSub?.cancel();
