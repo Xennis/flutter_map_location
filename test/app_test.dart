@@ -17,7 +17,6 @@ void main() {
 
 class _TestApp extends StatelessWidget {
   final MapController mapController = MapController();
-  final List<Marker> userLocationMarkers = <Marker>[];
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +33,7 @@ class _TestApp extends StatelessWidget {
               TileLayerOptions(
                   urlTemplate: 'https://{s}.tile.example.org/{z}/{x}/{y}.png',
                   subdomains: <String>['a', 'b', 'c']),
-              MarkerLayerOptions(markers: userLocationMarkers),
               LocationOptions(
-                markers: userLocationMarkers,
                 onLocationUpdate: (LatLngData ld) {},
                 onLocationRequested: (LatLngData ld) {},
                 buttonBuilder: (BuildContext context,

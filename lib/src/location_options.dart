@@ -19,14 +19,13 @@ typedef LocationMarkerBuilder = Marker Function(
 
 class LocationOptions extends LayerOptions {
   LocationOptions(
-      {@required this.markers,
-      this.onLocationUpdate,
+      {this.onLocationUpdate,
       this.onLocationRequested,
       @required this.buttonBuilder,
       this.markerBuilder,
       this.updateIntervalMs = 1000,
-      this.initiallyRequest = false})
-      : assert(markers != null, buttonBuilder != null),
+      this.initiallyRequest = true})
+      : assert(buttonBuilder != null),
         super();
 
   final void Function(LatLngData) onLocationUpdate;
@@ -35,5 +34,4 @@ class LocationOptions extends LayerOptions {
   final LocationMarkerBuilder markerBuilder;
   final int updateIntervalMs;
   final bool initiallyRequest;
-  List<Marker> markers;
 }

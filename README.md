@@ -8,6 +8,17 @@ A [flutter_map](https://pub.dev/packages/flutter_map) plugin to request and disp
 * Energy efficiency: The location service is turned off if the app runs in the background.
 * Usability: Developers are empowered to ensure a good [user experience](#User-experience).
 
+## Development branch
+
+Use the [dev](https://github.com/Xennis/flutter_map_location/tree/dev) for the latest changes. `flutter_map` merged recently a lot of changes but did not create a release yet. It's only possible to release Flutter packages with dependencies that are released as well. Therefore checkout this branch for the newest (unreleased) changes:
+
+```yaml
+  flutter_map_location:
+    git:
+      url: https://github.com/Xennis/flutter_map_location.git
+      ref: dev
+```
+
 ## User experience
 
 Status
