@@ -5,8 +5,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_location/src/types.dart';
+import 'package:geolocator/geolocator.dart'
+    show Geolocator, Position, LocationPermission;
 import 'package:latlong/latlong.dart';
-import 'package:location/location.dart';
 
 import 'location_marker.dart';
 import 'location_options.dart';
@@ -37,14 +38,13 @@ class LocationLayer extends StatefulWidget {
 
 class _LocationLayerState extends State<LocationLayer>
     with WidgetsBindingObserver {
-  final Location _location = Location();
   final ValueNotifier<LocationServiceStatus> _serviceStatus =
       ValueNotifier<LocationServiceStatus>(null);
   final ValueNotifier<LatLngData> _lastLocation =
       ValueNotifier<LatLngData>(null);
   final ValueNotifier<double> _heading = ValueNotifier<double>(null);
 
-  StreamSubscription<LocationData> _onLocationChangedSub;
+  StreamSubscription<Position> _onLocationChangedSub;
   StreamSubscription<CompassEvent> _compassEventsSub;
   bool _locationRequested = false;
 
@@ -52,11 +52,11 @@ class _LocationLayerState extends State<LocationLayer>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _location.changeSettings(interval: widget.options.updateIntervalMs);
     if (widget.options.initiallyRequest) {
       _locationRequested = true;
-      _initOnLocationUpdateSubscription().then(
-          (LocationServiceStatus status) => _serviceStatus.value = status);
+      _initOnLocationUpdateSubscription().then((LocationServiceStatus status) {
+        _serviceStatus.value = status;
+      });
     }
     _lastLocation.addListener(() {
       final LatLngData loc = _lastLocation.value;
@@ -126,15 +126,9 @@ class _LocationLayerState extends State<LocationLayer>
                   options: MarkerLayerOptions(markers: <Marker>[marker]));
             }),
         widget.options.buttonBuilder(context, _serviceStatus, () async {
-          if (_serviceStatus?.value == LocationServiceStatus.disabled) {
-            if (!await _location.requestService()) {
-              return;
-            }
-            _serviceStatus.value = null;
-          }
           if (_serviceStatus?.value != LocationServiceStatus.subscribed ||
               _lastLocation?.value == null ||
-              !await _location.serviceEnabled()) {
+              !await Geolocator.isLocationServiceEnabled()) {
             _initOnLocationUpdateSubscription(forceRequestLocation: true).then(
                 (LocationServiceStatus value) => _serviceStatus.value = value);
             _locationRequested = true;
@@ -148,21 +142,30 @@ class _LocationLayerState extends State<LocationLayer>
 
   Future<LocationServiceStatus> _initOnLocationUpdateSubscription(
       {bool forceRequestLocation = false}) async {
-    if (!await _location.serviceEnabled()) {
+    if (!await Geolocator.isLocationServiceEnabled()) {
       _lastLocation.value = null;
       return LocationServiceStatus.disabled;
     }
-    if (await _location.hasPermission() == PermissionStatus.denied) {
+    if (await Geolocator.checkPermission() == LocationPermission.denied) {
       if (widget.options.initiallyRequest || forceRequestLocation) {
-        if (await _location.requestPermission() != PermissionStatus.granted) {
+        if (<LocationPermission>[
+              LocationPermission.always,
+              LocationPermission.whileInUse
+            ].contains(await Geolocator.requestPermission()) ==
+            false) {
           _lastLocation.value = null;
           return LocationServiceStatus.permissionDenied;
         }
       }
     }
+
     await _onLocationChangedSub?.cancel();
-    _onLocationChangedSub =
-        _location.onLocationChanged.listen((LocationData ld) {
+
+    _onLocationChangedSub = Geolocator.getPositionStream(
+      intervalDuration: Duration(
+          milliseconds: widget
+              .options.updateIntervalMs), // TODO: migrate to proper `Duration`
+    ).listen((Position ld) {
       _lastLocation.value = _locationDataToLatLng(ld);
     }, onError: (Object error) {
       _lastLocation.value = null;
@@ -179,7 +182,7 @@ class _LocationLayerState extends State<LocationLayer>
   }
 }
 
-LatLngData _locationDataToLatLng(LocationData ld) {
+LatLngData _locationDataToLatLng(Position ld) {
   if (ld.latitude == null || ld.longitude == null) {
     return null;
   }
