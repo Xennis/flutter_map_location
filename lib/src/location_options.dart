@@ -23,7 +23,7 @@ class LocationOptions extends LayerOptions {
       this.onLocationRequested,
       @required this.buttonBuilder,
       this.markerBuilder,
-      this.updateIntervalMs = 1000,
+      this.updateInterval = const Duration(seconds: 1),
       this.initiallyRequest = true})
       : assert(buttonBuilder != null),
         super();
@@ -32,6 +32,6 @@ class LocationOptions extends LayerOptions {
   final void Function(LatLngData) onLocationRequested;
   final LocationButtonBuilder buttonBuilder;
   final LocationMarkerBuilder markerBuilder;
-  final int updateIntervalMs;
+  final Duration updateInterval;
   final bool initiallyRequest;
 }

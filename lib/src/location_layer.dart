@@ -164,9 +164,7 @@ class _LocationLayerState extends State<LocationLayer>
     await _onLocationChangedSub?.cancel();
 
     _onLocationChangedSub = Geolocator.getPositionStream(
-      intervalDuration: Duration(
-          milliseconds: widget
-              .options.updateIntervalMs), // TODO: migrate to proper `Duration`
+      intervalDuration: widget.options.updateInterval,
     ).listen((Position ld) {
       _lastLocation.value = _locationDataToLatLng(ld);
     }, onError: (Object error) {
