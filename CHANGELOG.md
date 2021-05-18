@@ -1,3 +1,15 @@
+## 0.10.0
+
+* Switch from `location` to `geolocator` package (#54)
+
+Thanks to TheOneWithTheBraid for the contribution.
+
+## 0.9.0
+
+* Add `initiallyRequest` option to set if location should initially requested (#38)
+
+Thanks to TheOneWithTheBraid for the contribution.
+
 ## 0.8.0
 
 * BREAKING CHANGE: Integrated the marker layer into the plugin. The option `markers` is removed. A `MarkerLayerOptions` outside of the plugin is not needed anymore. See update example for usage.

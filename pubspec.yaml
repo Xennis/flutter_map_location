@@ -1,6 +1,6 @@
 name: flutter_map_location
 description: flutter_map plugin to request and display the users location and heading on the map.
-version: 0.8.0
+version: 0.10.0
 homepage: https://github.com/Xennis/flutter_map_location
 
 environment:
@@ -15,8 +15,8 @@ dependencies:
     git:
       url: https://github.com/fleaflet/flutter_map.git
       ref: 38d9047ac6daff0948f70cffe1bba5132da0d170
+  geolocator: ^7.0.3
   latlong2: ^0.8.0
-  location: ^4.1.1
 
 dev_dependencies:
   flutter_test:
