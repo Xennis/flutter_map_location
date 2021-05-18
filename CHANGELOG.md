@@ -1,3 +1,9 @@
+## 0.10.0
+
+* Switch from `location` to `geolocator` package (#54)
+
+Thanks to TheOneWithTheBraid for the contribution.
+
 ## 0.9.0
 
 * Add `initiallyRequest` option to set if location should initially requested (#38)
