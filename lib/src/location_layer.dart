@@ -6,7 +6,11 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_location/src/types.dart';
 import 'package:geolocator/geolocator.dart'
-    show Geolocator, Position, LocationPermission;
+    show
+        Geolocator,
+        Position,
+        LocationPermission,
+        LocationServiceDisabledException;
 import 'package:latlong/latlong.dart';
 
 import 'location_marker.dart';
@@ -126,15 +130,17 @@ class _LocationLayerState extends State<LocationLayer>
                   options: MarkerLayerOptions(markers: <Marker>[marker]));
             }),
         widget.options.buttonBuilder(context, _serviceStatus, () async {
+          // Check if there is no location subscription, no location value or the location service is off.
           if (_serviceStatus?.value != LocationServiceStatus.subscribed ||
               _lastLocation?.value == null ||
               !await Geolocator.isLocationServiceEnabled()) {
             _initOnLocationUpdateSubscription(forceRequestLocation: true).then(
                 (LocationServiceStatus value) => _serviceStatus.value = value);
             _locationRequested = true;
-          } else {
-            widget.options.onLocationRequested?.call(_lastLocation.value);
+            return;
           }
+
+          widget.options.onLocationRequested?.call(_lastLocation.value);
         })
       ],
     ));
@@ -142,10 +148,6 @@ class _LocationLayerState extends State<LocationLayer>
 
   Future<LocationServiceStatus> _initOnLocationUpdateSubscription(
       {bool forceRequestLocation = false}) async {
-    if (!await Geolocator.isLocationServiceEnabled()) {
-      _lastLocation.value = null;
-      return LocationServiceStatus.disabled;
-    }
     if (await Geolocator.checkPermission() == LocationPermission.denied) {
       if (widget.options.initiallyRequest || forceRequestLocation) {
         if (<LocationPermission>[
@@ -169,7 +171,11 @@ class _LocationLayerState extends State<LocationLayer>
       _lastLocation.value = _locationDataToLatLng(ld);
     }, onError: (Object error) {
       _lastLocation.value = null;
-      _serviceStatus.value = LocationServiceStatus.unsubscribed;
+      if (error is LocationServiceDisabledException) {
+        _serviceStatus.value = LocationServiceStatus.disabled;
+      } else {
+        _serviceStatus.value = LocationServiceStatus.unsubscribed;
+      }
     }, onDone: () {
       _lastLocation.value = null;
       _serviceStatus.value = LocationServiceStatus.unsubscribed;
