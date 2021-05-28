@@ -38,35 +38,19 @@ class _CustomPageState extends State<CustomPage> {
             ],
             nonRotatedLayers: <LayerOptions>[
               LocationOptions(
-                onLocationUpdate: (LatLngData ld) {
+                locationButton(),
+                onLocationUpdate: (LatLngData? ld) {
                   print(
                       'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
                 },
-                onLocationRequested: (LatLngData ld) {
-                  if (ld == null || ld.location == null) {
+                onLocationRequested: (LatLngData? ld) {
+                  if (ld == null) {
                     return;
                   }
-                  mapController?.move(ld.location, 16.0);
-                },
-                buttonBuilder: (BuildContext context,
-                    ValueNotifier<LocationServiceStatus> status,
-                    Function onPressed) {
-                  return Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: FloatingActionButton(
-                          backgroundColor: Colors.pink,
-                          child: const Icon(
-                            Icons.home,
-                            color: Colors.black,
-                          ),
-                          onPressed: () => onPressed()),
-                    ),
-                  );
+                  mapController.move(ld.location, 16.0);
                 },
                 markerBuilder: (BuildContext context, LatLngData ld,
-                    ValueNotifier<double> heading) {
+                    ValueNotifier<double?> heading) {
                   return Marker(
                     point: ld.location,
                     builder: (_) => Container(
@@ -78,7 +62,7 @@ class _CustomPageState extends State<CustomPage> {
                               Container(
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.pink[300].withOpacity(0.7)),
+                                    color: Colors.pink[300]!.withOpacity(0.7)),
                                 height: 40.0,
                                 width: 40.0,
                               ),
@@ -99,5 +83,24 @@ class _CustomPageState extends State<CustomPage> {
             ],
           ),
         ));
+  }
+
+  LocationButtonBuilder locationButton() {
+    return (BuildContext context, ValueNotifier<LocationServiceStatus> status,
+        Function onPressed) {
+      return Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: FloatingActionButton(
+              backgroundColor: Colors.pink,
+              child: const Icon(
+                Icons.home,
+                color: Colors.black,
+              ),
+              onPressed: () => onPressed()),
+        ),
+      );
+    };
   }
 }
