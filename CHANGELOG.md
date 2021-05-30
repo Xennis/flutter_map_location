@@ -1,3 +1,8 @@
+## 0.11.0
+
+* BREAKING CHANGE: Plugin option `updateIntervalMs` of type `int` was removed. Instead the option `updateInterval` of type `Duration` was added. Example: Replace `updateIntervalMs: 1000` by `updateInterval: Duration(seconds: 1)`.
+* Update flutter_compass to remove indirect rxdart dependency
+
 ## 0.10.0
 
 * Switch from `location` to `geolocator` package (#54)
