@@ -8,15 +8,15 @@ double _degree2Radian(double degree) {
 }
 
 class LocationMarker extends StatelessWidget {
-  const LocationMarker({Key key, this.ld, this.heading}) : super(key: key);
+  const LocationMarker({Key? key, this.ld, this.heading}) : super(key: key);
 
   static final CustomPainter headingerPainter = LocationMarkerHeading();
-  final LatLngData ld;
-  final ValueNotifier<double> heading;
+  final LatLngData? ld;
+  final ValueNotifier<double?>? heading;
 
   @override
   Widget build(BuildContext context) {
-    final double diameter = ld != null && ld.highAccurency() ? 22.0 : 80.0;
+    final double diameter = ld != null && ld!.highAccurency() ? 22.0 : 80.0;
     return Container(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -24,14 +24,14 @@ class LocationMarker extends StatelessWidget {
           Stack(
             alignment: AlignmentDirectional.center,
             children: <Widget>[
-              ValueListenableBuilder<double>(
-                  valueListenable: heading ?? ValueNotifier<double>(null),
-                  builder: (BuildContext context, double value, Widget child) {
+              ValueListenableBuilder<double?>(
+                  valueListenable: heading ?? ValueNotifier<double?>(null),
+                  builder: (BuildContext context, double? value, Widget? child) {
                     if (value == null) {
                       return Container();
                     }
                     // Only display heading for an accurate location.
-                    if (ld == null || !ld.highAccurency()) {
+                    if (ld == null || !ld!.highAccurency()) {
                       return Container();
                     }
                     return Transform.rotate(
@@ -44,7 +44,7 @@ class LocationMarker extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.blue[300].withOpacity(0.7)),
+                    color: Colors.blue[300]!.withOpacity(0.7)),
                 height: diameter,
                 width: diameter,
               ),

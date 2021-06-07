@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_location/src/types.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_map/flutter_map.dart';
 
 void main() {
   testWidgets('Render app', (WidgetTester tester) async {
@@ -34,10 +34,10 @@ class _TestApp extends StatelessWidget {
                   urlTemplate: 'https://{s}.tile.example.org/{z}/{x}/{y}.png',
                   subdomains: <String>['a', 'b', 'c']),
               LocationOptions(
-                onLocationUpdate: (LatLngData ld) {},
-                onLocationRequested: (LatLngData ld) {},
+                onLocationUpdate: (LatLngData? ld) {},
+                onLocationRequested: (LatLngData? ld) {},
                 buttonBuilder: (BuildContext context,
-                    ValueNotifier<LocationServiceStatus> status,
+                    ValueNotifier<LocationServiceStatus?> status,
                     Function onPressed) {
                   return Align(
                     alignment: Alignment.bottomRight,

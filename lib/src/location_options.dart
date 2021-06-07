@@ -12,26 +12,25 @@ enum LocationServiceStatus {
 }
 
 typedef LocationButtonBuilder = Widget Function(BuildContext context,
-    ValueNotifier<LocationServiceStatus>, Function onPressed);
+    ValueNotifier<LocationServiceStatus?>, Function onPressed);
 
 typedef LocationMarkerBuilder = Marker Function(
-    BuildContext context, LatLngData ld, ValueNotifier<double> heading);
+    BuildContext context, LatLngData? ld, ValueNotifier<double?> heading);
 
 class LocationOptions extends LayerOptions {
   LocationOptions(
       {this.onLocationUpdate,
       this.onLocationRequested,
-      @required this.buttonBuilder,
+      required this.buttonBuilder,
       this.markerBuilder,
       this.updateInterval = const Duration(seconds: 1),
       this.initiallyRequest = true})
-      : assert(buttonBuilder != null),
-        super();
+      : super();
 
-  final void Function(LatLngData) onLocationUpdate;
-  final void Function(LatLngData) onLocationRequested;
+  final void Function(LatLngData?)? onLocationUpdate;
+  final void Function(LatLngData?)? onLocationRequested;
   final LocationButtonBuilder buttonBuilder;
-  final LocationMarkerBuilder markerBuilder;
+  final LocationMarkerBuilder? markerBuilder;
   final Duration updateInterval;
   final bool initiallyRequest;
 }
