@@ -11,10 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_compass: ^0.6.1
-  flutter_map:
-    git:
-      url: https://github.com/fleaflet/flutter_map.git
-      ref: d9674b5c4fec7d759462a417c8acc548a3e720e1
+  flutter_map: ^0.13.1
   geolocator: ^7.0.3
   latlong2: ^0.8.0
 
