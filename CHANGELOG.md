@@ -1,3 +1,12 @@
+## 0.12.0
+
+* Update flutter_map to support null safety, map rotation and latlong2 (#66)
+* Add null safety (#66)
+* Add map rotation support (#66)
+* Use latlong2 package instead of latlong (#66)
+
+Thanks to TheOneWithTheBraid for the contribution.
+
 ## 0.11.0
 
 * BREAKING CHANGE: Plugin option `updateIntervalMs` of type `int` was removed. Instead the option `updateInterval` of type `Duration` was added. Example: Replace `updateIntervalMs: 1000` by `updateInterval: Duration(seconds: 1)`.
