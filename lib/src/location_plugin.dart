@@ -10,7 +10,7 @@ class LocationPlugin extends MapPlugin {
   Widget createLayer(
       LayerOptions options, MapState mapState, Stream<Null> stream) {
     if (options is LocationOptions) {
-      return LocationLayer(options: options, map: mapState, stream: stream);
+      return LocationLayer(options, mapState, stream);
     }
     throw ArgumentError('options is not of type LocationOptions');
   }

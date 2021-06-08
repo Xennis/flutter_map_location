@@ -5,33 +5,34 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_compass/flutter_compass.dart'
     show CompassEvent, FlutterCompass;
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_location/src/types.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart'
     show
         Geolocator,
         Position,
         LocationPermission,
         LocationServiceDisabledException;
-import 'package:latlong/latlong.dart';
 
 import 'location_marker.dart';
 import 'location_options.dart';
 import 'types.dart';
 
 LocationMarkerBuilder _defaultMarkerBuilder =
-    (BuildContext context, LatLngData ld, ValueNotifier<double> heading) {
-  final double diameter = ld != null && ld.highAccurency() ? 60.0 : 120.0;
+    (BuildContext context, LatLngData ld, ValueNotifier<double?> heading) {
+  final double diameter = ld.highAccuracy() ? 60.0 : 120.0;
   return Marker(
     point: ld.location,
-    builder: (_) => LocationMarker(ld: ld, heading: heading),
+    builder: (_) => LocationMarker(ld, heading),
     height: diameter,
     width: diameter,
+    rotate: false,
   );
 };
 
 class LocationLayer extends StatefulWidget {
-  const LocationLayer({Key key, @required this.options, this.map, this.stream})
-      : assert(options != null),
-        super(key: key);
+  const LocationLayer(this.options, this.map, this.stream, {Key? key})
+      : super(key: key);
 
   final LocationOptions options;
   final MapState map;
@@ -44,18 +45,18 @@ class LocationLayer extends StatefulWidget {
 class _LocationLayerState extends State<LocationLayer>
     with WidgetsBindingObserver {
   final ValueNotifier<LocationServiceStatus> _serviceStatus =
-      ValueNotifier<LocationServiceStatus>(null);
-  final ValueNotifier<LatLngData> _location = ValueNotifier<LatLngData>(null);
-  final ValueNotifier<double> _heading = ValueNotifier<double>(null);
+      ValueNotifier<LocationServiceStatus>(LocationServiceStatus.unkown);
+  final ValueNotifier<LatLngData?> _location = ValueNotifier<LatLngData?>(null);
+  final ValueNotifier<double?> _heading = ValueNotifier<double?>(null);
 
-  StreamSubscription<Position> _onLocationChangedSub;
-  StreamSubscription<CompassEvent> _compassEventsSub;
+  StreamSubscription<Position>? _onLocationChangedSub;
+  StreamSubscription<CompassEvent>? _compassEventsSub;
   bool _locationRequested = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
     if (widget.options.initiallyRequest) {
       _locationRequested = true;
       _initOnLocationUpdateSubscription().then((LocationServiceStatus status) {
@@ -63,9 +64,9 @@ class _LocationLayerState extends State<LocationLayer>
       });
     }
     _location.addListener(() {
-      final LatLngData loc = _location.value;
+      final LatLngData? loc = _location.value;
       widget.options.onLocationUpdate?.call(loc);
-      if (loc == null || loc.location == null) {
+      if (loc == null) {
         return;
       }
       if (_locationRequested) {
@@ -80,7 +81,7 @@ class _LocationLayerState extends State<LocationLayer>
   void dispose() {
     _compassEventsSub?.cancel();
     _onLocationChangedSub?.cancel();
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
@@ -91,15 +92,15 @@ class _LocationLayerState extends State<LocationLayer>
       case AppLifecycleState.paused:
         _compassEventsSub?.cancel();
         _onLocationChangedSub?.cancel();
-        if (_serviceStatus?.value == LocationServiceStatus.subscribed) {
+        if (_serviceStatus.value == LocationServiceStatus.subscribed) {
           _serviceStatus.value = LocationServiceStatus.paused;
         } else {
-          _serviceStatus.value = null;
+          _serviceStatus.value = LocationServiceStatus.unkown;
         }
         break;
       case AppLifecycleState.resumed:
-        if (_serviceStatus?.value == LocationServiceStatus.paused) {
-          _serviceStatus.value = null;
+        if (_serviceStatus.value == LocationServiceStatus.paused) {
+          _serviceStatus.value = LocationServiceStatus.unkown;
           _initOnLocationUpdateSubscription().then(
               (LocationServiceStatus value) => _serviceStatus.value = value);
         }
@@ -115,23 +116,24 @@ class _LocationLayerState extends State<LocationLayer>
     return Container(
         child: Stack(
       children: <Widget>[
-        ValueListenableBuilder<LatLngData>(
+        ValueListenableBuilder<LatLngData?>(
             valueListenable: _location,
-            builder: (BuildContext context, LatLngData ld, Widget child) {
-              if (ld?.location == null) {
+            builder: (BuildContext context, LatLngData? ld, Widget? child) {
+              if (ld == null) {
                 return Container();
               }
-              final Marker marker = widget.options.markerBuilder != null
-                  ? widget.options
-                      .markerBuilder(context, _location.value, _heading)
-                  : _defaultMarkerBuilder(context, _location.value, _heading);
+              final LocationMarkerBuilder? customBuilder =
+                  widget.options.markerBuilder;
+              final Marker marker = customBuilder != null
+                  ? customBuilder(context, ld, _heading)
+                  : _defaultMarkerBuilder(context, ld, _heading);
               return MarkerLayerWidget(
                   options: MarkerLayerOptions(markers: <Marker>[marker]));
             }),
         widget.options.buttonBuilder(context, _serviceStatus, () async {
           // Check if there is no location subscription, no location value or the location service is off.
-          if (_serviceStatus?.value != LocationServiceStatus.subscribed ||
-              _location?.value == null ||
+          if (_serviceStatus.value != LocationServiceStatus.subscribed ||
+              _location.value == null ||
               !await Geolocator.isLocationServiceEnabled()) {
             _initOnLocationUpdateSubscription(forceRequestLocation: true).then(
                 (LocationServiceStatus value) => _serviceStatus.value = value);
@@ -162,8 +164,8 @@ class _LocationLayerState extends State<LocationLayer>
 
     await _onLocationChangedSub?.cancel();
     _onLocationChangedSub = Geolocator.getPositionStream(
-      intervalDuration: widget.options.updateInterval,
-    ).listen((Position ld) {
+            intervalDuration: widget.options.updateInterval)
+        .listen((Position ld) {
       _location.value = _locationDataToLatLng(ld);
     }, onError: (Object error) {
       _location.value = null;
@@ -178,7 +180,7 @@ class _LocationLayerState extends State<LocationLayer>
     });
 
     await _compassEventsSub?.cancel();
-    _compassEventsSub = FlutterCompass.events.listen((CompassEvent event) {
+    _compassEventsSub = FlutterCompass.events?.listen((CompassEvent event) {
       _heading.value = event.heading;
     });
 
@@ -187,8 +189,5 @@ class _LocationLayerState extends State<LocationLayer>
 }
 
 LatLngData _locationDataToLatLng(Position ld) {
-  if (ld.latitude == null || ld.longitude == null) {
-    return null;
-  }
   return LatLngData(LatLng(ld.latitude, ld.longitude), ld.accuracy);
 }
