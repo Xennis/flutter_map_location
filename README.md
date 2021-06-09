@@ -1,6 +1,6 @@
 # Flutter Map – Location plugin
 
-[![Flutter](https://github.com/Xennis/flutter_map_location/workflows/Flutter/badge.svg?branch=master&event=push)](https://github.com/Xennis/flutter_map_location/actions?query=workflow%3A%22Flutter%22+event%3Apush+branch%3Amaster) [![Pub](https://img.shields.io/pub/v/flutter_map_location.svg)](https://pub.dev/packages/flutter_map_location)
+[![Flutter](https://github.com/Xennis/flutter_map_location/workflows/Flutter/badge.svg?branch=main&event=push)](https://github.com/Xennis/flutter_map_location/actions?query=workflow%3A%22Flutter%22+event%3Apush+branch%3Amain) [![Pub](https://img.shields.io/pub/v/flutter_map_location.svg)](https://pub.dev/packages/flutter_map_location)
 
 A [flutter_map](https://pub.dev/packages/flutter_map) plugin to request and display the users location and heading on the map. The core features of the plugin are:
 
@@ -50,17 +50,17 @@ See [reference example code](https://github.com/Xennis/flutter_map_location/blob
 
 ## Usage
 
-Look at the [default example](https://github.com/Xennis/flutter_map_location/blob/master/example/lib/pages/default.dart) and the notes inside the code. That's a working example.
+Look at the [default example](https://github.com/Xennis/flutter_map_location/blob/main/example/lib/pages/default.dart) and the notes inside the code. That's a working example.
 
 ## Demo / example
 
 A working example can be found in the `example/` directory. It contains a page with the default settings:
 
-![Default example](https://raw.githubusercontent.com/Xennis/flutter_map_location/master/example/default.png)
+![Default example](https://raw.githubusercontent.com/Xennis/flutter_map_location/main/example/default.png)
 
 ... and one with customized button and marker:
 
-![Custom example](https://raw.githubusercontent.com/Xennis/flutter_map_location/master/example/custom.png)
+![Custom example](https://raw.githubusercontent.com/Xennis/flutter_map_location/main/example/custom.png)
 
 (Map attribution: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors)
 
