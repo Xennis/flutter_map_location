@@ -1,7 +1,7 @@
 import 'package:latlong2/latlong.dart';
 
 class LatLngData {
-  const LatLngData(this.location, this.accuracy);
+  const LatLngData(this.location, this.accuracy, this.heading);
 
   final LatLng location;
 
@@ -9,6 +9,8 @@ class LatLngData {
   ///
   /// If the accuracy is not available it's 0.0.
   final double accuracy;
+
+  final double? heading;
 
   bool highAccuracy() {
     // Use > and not >= because 0.0 means no accurency.

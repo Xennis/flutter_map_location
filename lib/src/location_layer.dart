@@ -2,17 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_compass/flutter_compass.dart'
-    show CompassEvent, FlutterCompass;
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_location/src/location_controller.dart';
 import 'package:flutter_map_location/src/types.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:geolocator/geolocator.dart'
-    show
-        Geolocator,
-        Position,
-        LocationPermission,
-        LocationServiceDisabledException;
 
 import 'location_marker.dart';
 import 'location_options.dart';
@@ -44,14 +36,9 @@ class LocationLayer extends StatefulWidget {
 
 class _LocationLayerState extends State<LocationLayer>
     with WidgetsBindingObserver {
-  final ValueNotifier<LocationServiceStatus> _serviceStatus =
-      ValueNotifier<LocationServiceStatus>(LocationServiceStatus.unkown);
-  final ValueNotifier<LatLngData?> _location = ValueNotifier<LatLngData?>(null);
-  final ValueNotifier<double?> _heading = ValueNotifier<double?>(null);
 
-  StreamSubscription<Position>? _onLocationChangedSub;
-  StreamSubscription<CompassEvent>? _compassEventsSub;
   bool _locationRequested = false;
+  bool _subscriptionPaused = false;
 
   @override
   void initState() {
@@ -59,12 +46,11 @@ class _LocationLayerState extends State<LocationLayer>
     WidgetsBinding.instance?.addObserver(this);
     if (widget.options.initiallyRequest) {
       _locationRequested = true;
-      _initOnLocationUpdateSubscription().then((LocationServiceStatus status) {
-        _serviceStatus.value = status;
-      });
+      widget.options.controller.unsubscribe().then((value) => widget.options.controller.subscribe(intervalDuration: widget.options.updateInterval));
     }
-    _location.addListener(() {
-      final LatLngData? loc = _location.value;
+    final ValueNotifier<LatLngData?> location = widget.options.controller.location;
+    location.addListener(() {
+      final LatLngData? loc = location.value;
       widget.options.onLocationUpdate?.call(loc);
       if (loc == null) {
         return;
@@ -79,9 +65,8 @@ class _LocationLayerState extends State<LocationLayer>
 
   @override
   void dispose() {
-    _compassEventsSub?.cancel();
-    _onLocationChangedSub?.cancel();
     WidgetsBinding.instance?.removeObserver(this);
+    widget.options.controller.dispose();
     super.dispose();
   }
 
@@ -90,19 +75,12 @@ class _LocationLayerState extends State<LocationLayer>
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.paused:
-        _compassEventsSub?.cancel();
-        _onLocationChangedSub?.cancel();
-        if (_serviceStatus.value == LocationServiceStatus.subscribed) {
-          _serviceStatus.value = LocationServiceStatus.paused;
-        } else {
-          _serviceStatus.value = LocationServiceStatus.unkown;
-        }
+        widget.options.controller.unsubscribe();
+        _subscriptionPaused = true;
         break;
       case AppLifecycleState.resumed:
-        if (_serviceStatus.value == LocationServiceStatus.paused) {
-          _serviceStatus.value = LocationServiceStatus.unkown;
-          _initOnLocationUpdateSubscription().then(
-              (LocationServiceStatus value) => _serviceStatus.value = value);
+        if (_subscriptionPaused) {
+          widget.options.controller.subscribe();
         }
         break;
       case AppLifecycleState.inactive:
@@ -113,11 +91,12 @@ class _LocationLayerState extends State<LocationLayer>
 
   @override
   Widget build(BuildContext context) {
+    final LocationController controller = widget.options.controller;
     return Container(
         child: Stack(
       children: <Widget>[
         ValueListenableBuilder<LatLngData?>(
-            valueListenable: _location,
+            valueListenable: controller.location,
             builder: (BuildContext context, LatLngData? ld, Widget? child) {
               if (ld == null) {
                 return Container();
@@ -125,69 +104,21 @@ class _LocationLayerState extends State<LocationLayer>
               final LocationMarkerBuilder? customBuilder =
                   widget.options.markerBuilder;
               final Marker marker = customBuilder != null
-                  ? customBuilder(context, ld, _heading)
-                  : _defaultMarkerBuilder(context, ld, _heading);
+                  ? customBuilder(context, ld, controller.heading)
+                  : _defaultMarkerBuilder(context, ld, controller.heading);
               return MarkerLayerWidget(
                   options: MarkerLayerOptions(markers: <Marker>[marker]));
             }),
-        widget.options.buttonBuilder(context, _serviceStatus, () async {
-          // Check if there is no location subscription, no location value or the location service is off.
-          if (_serviceStatus.value != LocationServiceStatus.subscribed ||
-              _location.value == null ||
-              !await Geolocator.isLocationServiceEnabled()) {
-            _initOnLocationUpdateSubscription(forceRequestLocation: true).then(
-                (LocationServiceStatus value) => _serviceStatus.value = value);
+        widget.options.buttonBuilder(context, controller.status, () async {
+          if (await controller.noSub()) {
+                      widget.options.controller.unsubscribe().then((value) => widget.options.controller.subscribe(updateInterval: widget.options.updateInterval));
             _locationRequested = true;
             return;
           }
 
-          widget.options.onLocationRequested?.call(_location.value);
+          widget.options.onLocationRequested?.call(controller.location.value);
         })
       ],
     ));
   }
-
-  Future<LocationServiceStatus> _initOnLocationUpdateSubscription(
-      {bool forceRequestLocation = false}) async {
-    if (await Geolocator.checkPermission() == LocationPermission.denied) {
-      if (widget.options.initiallyRequest || forceRequestLocation) {
-        if (<LocationPermission>[
-              LocationPermission.always,
-              LocationPermission.whileInUse
-            ].contains(await Geolocator.requestPermission()) ==
-            false) {
-          _location.value = null;
-          return LocationServiceStatus.permissionDenied;
-        }
-      }
     }
-
-    await _onLocationChangedSub?.cancel();
-    _onLocationChangedSub = Geolocator.getPositionStream(
-            intervalDuration: widget.options.updateInterval)
-        .listen((Position ld) {
-      _location.value = _locationDataToLatLng(ld);
-    }, onError: (Object error) {
-      _location.value = null;
-      if (error is LocationServiceDisabledException) {
-        _serviceStatus.value = LocationServiceStatus.disabled;
-      } else {
-        _serviceStatus.value = LocationServiceStatus.unsubscribed;
-      }
-    }, onDone: () {
-      _location.value = null;
-      _serviceStatus.value = LocationServiceStatus.unsubscribed;
-    });
-
-    await _compassEventsSub?.cancel();
-    _compassEventsSub = FlutterCompass.events?.listen((CompassEvent event) {
-      _heading.value = event.heading;
-    });
-
-    return LocationServiceStatus.subscribed;
-  }
-}
-
-LatLngData _locationDataToLatLng(Position ld) {
-  return LatLngData(LatLng(ld.latitude, ld.longitude), ld.accuracy);
-}
