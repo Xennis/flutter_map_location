@@ -8,11 +8,10 @@ double _degree2Radian(double degree) {
 }
 
 class LocationMarker extends StatelessWidget {
-  const LocationMarker(this.ld, this.heading, {Key? key}) : super(key: key);
+  const LocationMarker(this.ld, {Key? key}) : super(key: key);
 
   static final CustomPainter headingerPainter = LocationMarkerHeading();
   final LatLngData ld;
-  final ValueNotifier<double?> heading;
 
   @override
   Widget build(BuildContext context) {
@@ -24,24 +23,7 @@ class LocationMarker extends StatelessWidget {
           Stack(
             alignment: AlignmentDirectional.center,
             children: <Widget>[
-              ValueListenableBuilder<double?>(
-                  valueListenable: heading,
-                  builder:
-                      (BuildContext context, double? value, Widget? child) {
-                    if (value == null) {
-                      return Container();
-                    }
-                    // Only display heading for an accurate location.
-                    if (!ld.highAccuracy()) {
-                      return Container();
-                    }
-                    return Transform.rotate(
-                      angle: _degree2Radian(value),
-                      child: CustomPaint(
-                        painter: headingerPainter,
-                      ),
-                    );
-                  }),
+              _heading(),
               Container(
                 decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -61,6 +43,23 @@ class LocationMarker extends StatelessWidget {
       ),
     );
   }
+
+  Widget _heading() {
+    if (ld.heading == null) {
+      return Container();
+    }
+    // Only display heading for an accurate location.
+    if (!ld.highAccuracy()) {
+      return Container();
+    }
+    return Transform.rotate(
+      angle: _degree2Radian(ld.heading!),
+      child: CustomPaint(
+        painter: headingerPainter,
+      ),
+    );
+  }
+
 }
 
 class LocationMarkerHeading extends CustomPainter {

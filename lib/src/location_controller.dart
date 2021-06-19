@@ -1,29 +1,27 @@
-
 import 'dart:async';
 import 'package:async/async.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_compass/flutter_compass.dart' show CompassEvent, FlutterCompass;
+import 'package:flutter_compass/flutter_compass.dart'
+    show CompassEvent, FlutterCompass;
 import 'package:geolocator/geolocator.dart'
     show
         Geolocator,
         Position,
         LocationPermission,
         LocationServiceDisabledException;
-      
+
 import 'package:latlong2/latlong.dart';
 
 import '../flutter_map_location.dart';
 
-
 class LocationController {
-
+  final StreamController<LatLngData> _controller = StreamController<LatLngData>();
   StreamSubscription<Position>? _onLocationChangedSub;
   StreamSubscription<CompassEvent>? _compassEventsSub;
 
   LocationServiceStatus _status = LocationServiceStatus.unkown;
   Position? _position;
   CompassEvent? _heading;
-
 
   //ValueNotifier<double?> get heading => _heading;
 
@@ -32,6 +30,7 @@ class LocationController {
   //ValueNotifier<LocationServiceStatus> get status => _serviceStatus;
 
   void dispose() {
+    _controller?.close();
     _onLocationChangedSub?.cancel();
     _compassEventsSub?.cancel();
     _status = LocationServiceStatus.unkown;
@@ -39,15 +38,15 @@ class LocationController {
 
   Future<bool> requestPermissions() async {
     if (await Geolocator.checkPermission() == LocationPermission.denied) {
-        if (<LocationPermission>[
-              LocationPermission.always,
-              LocationPermission.whileInUse
-            ].contains(await Geolocator.requestPermission()) ==
-            false) {
-              _position = null;
-          _status = LocationServiceStatus.permissionDenied;
-          return Future<bool>.value(false);
-        }
+      if (<LocationPermission>[
+            LocationPermission.always,
+            LocationPermission.whileInUse
+          ].contains(await Geolocator.requestPermission()) ==
+          false) {
+        _position = null;
+        _status = LocationServiceStatus.permissionDenied;
+        return Future<bool>.value(false);
+      }
     }
     return Future<bool>.value(true);
   }
@@ -61,10 +60,12 @@ class LocationController {
   }
 
   Stream<LatLngData> subscribe(Duration intervalDuration) {
-    _onLocationChangedSub = Geolocator.getPositionStream(
-            intervalDuration: intervalDuration)
-        .listen((Position ld) {
-          _position = ld;
+    _onLocationChangedSub =
+        Geolocator.getPositionStream(intervalDuration: intervalDuration).listen(
+            (Position ld) {
+      _controller.add(LatLngData(
+          LatLng(ld.latitude, ld.longitude), ld.accuracy, _heading?.heading));
+      _position = ld;
     }, onError: (Object error) {
       _position = null;
       if (error is LocationServiceDisabledException) {
@@ -72,19 +73,41 @@ class LocationController {
       } else {
         _status = LocationServiceStatus.unsubscribed;
       }
+      _controller.addError(error);
     }, onDone: () {
       _position = null;
       _status = LocationServiceStatus.unsubscribed;
+      _controller.done;
     });
 
     _compassEventsSub = FlutterCompass.events?.listen((CompassEvent event) {
+      if (_position != null) {
+        _controller.add(LatLngData(
+            LatLng(_position!.latitude, _position!.longitude),
+            _position!.accuracy,
+            event.heading));
+      }
       _heading = event;
+    }, onError: (Object error) {
+      if (_position != null) {
+        _controller.add(LatLngData(
+            LatLng(_position!.latitude, _position!.longitude),
+            _position!.accuracy,
+            null));
+      }
+      _heading = null;
+    }, onDone: () {
+      if (_position != null) {
+        _controller.add(LatLngData(
+            LatLng(_position!.latitude, _position!.longitude),
+            _position!.accuracy,
+            null));
+      }
+      _heading = null;
     });
 
     _status = LocationServiceStatus.subscribed;
-
-    // TODO: Continue here.
-    return Stream<int>.periodic(intervalDuration).map((int event) => LatLngData(LatLng(_position.latitude, _position.longitude), _position.accuracy, _heading.heading));
+    return _controller.stream;
   }
 
   Future<void> unsubscribe() {
@@ -99,31 +122,4 @@ class LocationController {
     _status = LocationServiceStatus.unkown;
     return Future.wait(waitGroup);
   }
-  
 }
-
-
-/*
-class LocationState {
-
-  LocationState(this._locationEventSink);
-
-  final StreamSink<LocationEvent> _locationEventSink;
-
-  StreamSubscription<Position>? onLocationChangedSub;
-  StreamSubscription<CompassEvent>? compassEventsSub;
-
-  void dispose() {
-    compassEventsSub?.cancel();
-    onLocationChangedSub?.cancel();
-    _locationEventSink.close();
-  }
-
-  void unsubscribe() {
-    _locationEventSink.add(LocationEventUnscribe());
-
-    compassEventsSub?.cancel();
-    onLocationChangedSub?.cancel();
-  }
-}
-*/

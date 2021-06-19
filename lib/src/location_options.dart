@@ -18,7 +18,7 @@ typedef LocationButtonBuilder = Widget Function(BuildContext context,
     ValueNotifier<LocationServiceStatus>, Function onPressed);
 
 typedef LocationMarkerBuilder = Marker Function(
-    BuildContext context, LatLngData ld, ValueNotifier<double?> heading);
+    BuildContext context, LatLngData ld);
 
 class LocationOptions extends LayerOptions {
   LocationOptions(this.buttonBuilder,
@@ -28,7 +28,8 @@ class LocationOptions extends LayerOptions {
       LocationController? controller,
       this.updateInterval = const Duration(seconds: 1),
       this.initiallyRequest = true})
-      : controller = controller ?? LocationController(), super();
+      : controller = controller ?? LocationController(),
+        super();
 
   /// If the LocationController is provided it can be used to programmatically access
   /// the functions of the plugin.

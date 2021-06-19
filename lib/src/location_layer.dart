@@ -11,11 +11,11 @@ import 'location_options.dart';
 import 'types.dart';
 
 LocationMarkerBuilder _defaultMarkerBuilder =
-    (BuildContext context, LatLngData ld, ValueNotifier<double?> heading) {
+    (BuildContext context, LatLngData ld) {
   final double diameter = ld.highAccuracy() ? 60.0 : 120.0;
   return Marker(
     point: ld.location,
-    builder: (_) => LocationMarker(ld, heading),
+    builder: (_) => LocationMarker(ld),
     height: diameter,
     width: diameter,
     rotate: false,
@@ -36,9 +36,9 @@ class LocationLayer extends StatefulWidget {
 
 class _LocationLayerState extends State<LocationLayer>
     with WidgetsBindingObserver {
-
   bool _locationRequested = false;
   bool _subscriptionPaused = false;
+  Stream<LatLngData?>? _positionStream;
 
   @override
   void initState() {
@@ -46,21 +46,8 @@ class _LocationLayerState extends State<LocationLayer>
     WidgetsBinding.instance?.addObserver(this);
     if (widget.options.initiallyRequest) {
       _locationRequested = true;
-      widget.options.controller.unsubscribe().then((value) => widget.options.controller.subscribe(intervalDuration: widget.options.updateInterval));
+      subscribeToPosition();
     }
-    final ValueNotifier<LatLngData?> location = widget.options.controller.location;
-    location.addListener(() {
-      final LatLngData? loc = location.value;
-      widget.options.onLocationUpdate?.call(loc);
-      if (loc == null) {
-        return;
-      }
-      if (_locationRequested) {
-        _locationRequested = false;
-        widget.options.onLocationRequested?.call(loc);
-      }
-      //setState(() {});
-    });
   }
 
   @override
@@ -80,7 +67,8 @@ class _LocationLayerState extends State<LocationLayer>
         break;
       case AppLifecycleState.resumed:
         if (_subscriptionPaused) {
-          widget.options.controller.subscribe();
+          _subscriptionPaused = false;
+          subscribeToPosition();
         }
         break;
       case AppLifecycleState.inactive:
@@ -89,30 +77,50 @@ class _LocationLayerState extends State<LocationLayer>
     }
   }
 
+  void subscribeToPosition() {
+    // Ensure there is just one subscription
+    widget.options.controller.unsubscribe().then((void value) {
+      setState(() {
+        _positionStream = widget.options.controller.subscribe(widget.options.updateInterval);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final LocationController controller = widget.options.controller;
     return Container(
         child: Stack(
       children: <Widget>[
-        ValueListenableBuilder<LatLngData?>(
-            valueListenable: controller.location,
-            builder: (BuildContext context, LatLngData? ld, Widget? child) {
+        StreamBuilder<LatLngData?>(
+            stream: widget.options.controller
+                .subscribe(widget.options.updateInterval),
+            initialData: null,
+            builder:
+                (BuildContext context, AsyncSnapshot<LatLngData?> snapshot) {
+              final LatLngData? ld = snapshot.data;
               if (ld == null) {
                 return Container();
               }
+
+              widget.options.onLocationUpdate?.call(ld);
+              if (_locationRequested) {
+                _locationRequested = false;
+                widget.options.onLocationRequested?.call(ld);
+              }
+
               final LocationMarkerBuilder? customBuilder =
                   widget.options.markerBuilder;
               final Marker marker = customBuilder != null
-                  ? customBuilder(context, ld, controller.heading)
-                  : _defaultMarkerBuilder(context, ld, controller.heading);
+                  ? customBuilder(context, ld)
+                  : _defaultMarkerBuilder(context, ld);
               return MarkerLayerWidget(
                   options: MarkerLayerOptions(markers: <Marker>[marker]));
             }),
         widget.options.buttonBuilder(context, controller.status, () async {
           if (await controller.noSub()) {
-                      widget.options.controller.unsubscribe().then((value) => widget.options.controller.subscribe(updateInterval: widget.options.updateInterval));
             _locationRequested = true;
+            subscribeToPosition();
             return;
           }
 
@@ -121,4 +129,4 @@ class _LocationLayerState extends State<LocationLayer>
       ],
     ));
   }
-    }
+}
