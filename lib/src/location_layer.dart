@@ -7,13 +7,13 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_location/src/location_controller.dart';
 import 'package:flutter_map_location/src/types.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart'
     show
         Geolocator,
         Position,
         LocationPermission,
         LocationServiceDisabledException;
+import 'package:latlong2/latlong.dart';
 
 import 'location_marker.dart';
 import 'location_options.dart';
