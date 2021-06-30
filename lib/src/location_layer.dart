@@ -8,12 +8,7 @@ import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_location/src/location_controller.dart';
 import 'package:flutter_map_location/src/types.dart';
 import 'package:geolocator/geolocator.dart'
-    show
-        Geolocator,
-        Position,
-        LocationPermission,
-        LocationServiceDisabledException;
-import 'package:latlong2/latlong.dart';
+    show Geolocator, LocationServiceDisabledException;
 
 import 'location_marker.dart';
 import 'location_options.dart';
@@ -51,6 +46,7 @@ class _LocationLayerState extends State<LocationLayer>
   final ValueNotifier<double?> _heading = ValueNotifier<double?>(null);
   late final LocationControllerImpl _controller;
 
+  StreamSubscription<LatLngData>? _locationSub;
   bool _locationRequested = false;
 
   @override
@@ -61,26 +57,13 @@ class _LocationLayerState extends State<LocationLayer>
     WidgetsBinding.instance?.addObserver(this);
     if (widget.options.initiallyRequest) {
       _locationRequested = true;
-      _initOnLocationUpdateSubscription().then((LocationServiceStatus status) {
-        _serviceStatus.value = status;
-      });
+      _initOnLocationUpdateSubscription();
     }
-    _location.addListener(() {
-      final LatLngData? loc = _location.value;
-      widget.options.onLocationUpdate?.call(loc);
-      if (loc == null) {
-        return;
-      }
-      if (_locationRequested) {
-        _locationRequested = false;
-        widget.options.onLocationRequested?.call(loc);
-      }
-      //setState(() {});
-    });
   }
 
   @override
   void dispose() {
+    _locationSub?.cancel();
     _controller.dispose();
     WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
@@ -102,8 +85,7 @@ class _LocationLayerState extends State<LocationLayer>
       case AppLifecycleState.resumed:
         if (_serviceStatus.value == LocationServiceStatus.paused) {
           _serviceStatus.value = LocationServiceStatus.unkown;
-          _initOnLocationUpdateSubscription().then(
-              (LocationServiceStatus value) => _serviceStatus.value = value);
+          _initOnLocationUpdateSubscription();
         }
         break;
       case AppLifecycleState.inactive:
@@ -134,10 +116,8 @@ class _LocationLayerState extends State<LocationLayer>
         widget.options.buttonBuilder(context, _serviceStatus, () async {
           // Check if there is no location subscription, no location value or the location service is off.
           if (!_controller.isSubscribed() ||
-              _location.value == null ||
               !await Geolocator.isLocationServiceEnabled()) {
-            _initOnLocationUpdateSubscription(forceRequestLocation: true).then(
-                (LocationServiceStatus value) => _serviceStatus.value = value);
+            _initOnLocationUpdateSubscription();
             _locationRequested = true;
             return;
           }
@@ -148,33 +128,31 @@ class _LocationLayerState extends State<LocationLayer>
     ));
   }
 
-  Future<LocationServiceStatus> _initOnLocationUpdateSubscription(
-      {bool forceRequestLocation = false}) async {
-    if (await Geolocator.checkPermission() == LocationPermission.denied) {
-      if (widget.options.initiallyRequest || forceRequestLocation) {
-        if (<LocationPermission>[
-              LocationPermission.always,
-              LocationPermission.whileInUse
-            ].contains(await Geolocator.requestPermission()) ==
-            false) {
-          _location.value = null;
-          return LocationServiceStatus.permissionDenied;
-        }
-      }
+  // ignore: avoid_void_async
+  void _initOnLocationUpdateSubscription() async {
+    if (!await _controller.requestPermissions()) {
+      _serviceStatus.value = LocationServiceStatus.permissionDenied;
+      return;
     }
 
+    await _locationSub?.cancel();
     await _controller.unsubscribePosition();
-    _controller.subscribePosition(widget.options.updateInterval, (Position ld) {
-      _location.value = _locationDataToLatLng(ld);
+    _locationSub = _controller
+        .subscribePosition(widget.options.updateInterval)
+        .listen((LatLngData loc) {
+      _location.value = loc;
+      widget.options.onLocationUpdate?.call(loc);
+      if (_locationRequested) {
+        _locationRequested = false;
+        widget.options.onLocationRequested?.call(loc);
+      }
     }, onError: (Object error) {
-      _location.value = null;
       if (error is LocationServiceDisabledException) {
         _serviceStatus.value = LocationServiceStatus.disabled;
       } else {
         _serviceStatus.value = LocationServiceStatus.unsubscribed;
       }
     }, onDone: () {
-      _location.value = null;
       _serviceStatus.value = LocationServiceStatus.unsubscribed;
     });
 
@@ -183,10 +161,6 @@ class _LocationLayerState extends State<LocationLayer>
       _heading.value = event.heading;
     });
 
-    return LocationServiceStatus.subscribed;
+    _serviceStatus.value = LocationServiceStatus.subscribed;
   }
-}
-
-LatLngData _locationDataToLatLng(Position ld) {
-  return LatLngData(LatLng(ld.latitude, ld.longitude), ld.accuracy);
 }
