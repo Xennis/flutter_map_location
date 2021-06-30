@@ -39,6 +39,7 @@ class _CustomPageState extends State<CustomPage> {
             nonRotatedLayers: <LayerOptions>[
               LocationOptions(
                 locationButton(),
+                initiallyRequest: false,
                 onLocationUpdate: (LatLngData? ld) {
                   print(
                       'Location updated: ${ld?.location} (accuracy: ${ld?.accuracy})');
