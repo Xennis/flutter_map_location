@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_location/flutter_map_location.dart';
+import 'package:flutter_map_location/src/location_controller.dart';
 import 'package:flutter_map_location/src/types.dart';
 
 enum LocationServiceStatus {
@@ -23,10 +25,15 @@ class LocationOptions extends LayerOptions {
       {this.onLocationUpdate,
       this.onLocationRequested,
       this.markerBuilder,
+      LocationController? controller,
       this.updateInterval = const Duration(seconds: 1),
       this.initiallyRequest = true})
-      : super();
+      : controller = controller ?? LocationControllerImpl(),
+        super();
 
+  /// If the LocationController is provided it can be used to programmatically access
+  /// the functions of the plugin.
+  final LocationController controller;
   final void Function(LatLngData?)? onLocationUpdate;
   final void Function(LatLngData?)? onLocationRequested;
   final LocationButtonBuilder buttonBuilder;

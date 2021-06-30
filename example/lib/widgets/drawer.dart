@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../pages/controller.dart';
 import '../pages/custom.dart';
 import '../pages/default.dart';
 
@@ -38,6 +39,12 @@ Drawer buildDrawer(BuildContext context, String currentRoute) {
           context,
           const Text('Custom'),
           CustomPage.route,
+          currentRoute,
+        ),
+        _buildMenuItem(
+          context,
+          const Text('Controller'),
+          ControllerPage.route,
           currentRoute,
         ),
       ],
