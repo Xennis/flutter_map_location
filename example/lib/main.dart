@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'pages/controller.dart';
 import 'pages/custom.dart';
 import 'pages/default.dart';
 
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
         home: DefaultPage(),
         routes: <String, WidgetBuilder>{
           CustomPage.route: (_) => CustomPage(),
+          ControllerPage.route: (_) => ControllerPage(),
         });
   }
 }

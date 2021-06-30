@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_compass/flutter_compass.dart'
-    show CompassEvent, FlutterCompass;
+import 'package:flutter_compass/flutter_compass.dart' show CompassEvent;
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_location/flutter_map_location.dart';
+import 'package:flutter_map_location/src/location_controller.dart';
 import 'package:flutter_map_location/src/types.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart'
@@ -48,14 +49,15 @@ class _LocationLayerState extends State<LocationLayer>
       ValueNotifier<LocationServiceStatus>(LocationServiceStatus.unkown);
   final ValueNotifier<LatLngData?> _location = ValueNotifier<LatLngData?>(null);
   final ValueNotifier<double?> _heading = ValueNotifier<double?>(null);
+  late final LocationControllerImpl _controller;
 
-  StreamSubscription<Position>? _onLocationChangedSub;
-  StreamSubscription<CompassEvent>? _compassEventsSub;
   bool _locationRequested = false;
 
   @override
   void initState() {
     super.initState();
+    _controller = widget.options.controller as LocationControllerImpl? ??
+        LocationController() as LocationControllerImpl;
     WidgetsBinding.instance?.addObserver(this);
     if (widget.options.initiallyRequest) {
       _locationRequested = true;
@@ -79,8 +81,7 @@ class _LocationLayerState extends State<LocationLayer>
 
   @override
   void dispose() {
-    _compassEventsSub?.cancel();
-    _onLocationChangedSub?.cancel();
+    _controller.dispose();
     WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
@@ -90,8 +91,8 @@ class _LocationLayerState extends State<LocationLayer>
     super.didChangeAppLifecycleState(state);
     switch (state) {
       case AppLifecycleState.paused:
-        _compassEventsSub?.cancel();
-        _onLocationChangedSub?.cancel();
+        _controller.unsubscribeCompass();
+        _controller.unsubscribePosition();
         if (_serviceStatus.value == LocationServiceStatus.subscribed) {
           _serviceStatus.value = LocationServiceStatus.paused;
         } else {
@@ -132,7 +133,7 @@ class _LocationLayerState extends State<LocationLayer>
             }),
         widget.options.buttonBuilder(context, _serviceStatus, () async {
           // Check if there is no location subscription, no location value or the location service is off.
-          if (_serviceStatus.value != LocationServiceStatus.subscribed ||
+          if (!_controller.isSubscribed() ||
               _location.value == null ||
               !await Geolocator.isLocationServiceEnabled()) {
             _initOnLocationUpdateSubscription(forceRequestLocation: true).then(
@@ -162,10 +163,8 @@ class _LocationLayerState extends State<LocationLayer>
       }
     }
 
-    await _onLocationChangedSub?.cancel();
-    _onLocationChangedSub = Geolocator.getPositionStream(
-            intervalDuration: widget.options.updateInterval)
-        .listen((Position ld) {
+    await _controller.unsubscribePosition();
+    _controller.subscribePosition(widget.options.updateInterval, (Position ld) {
       _location.value = _locationDataToLatLng(ld);
     }, onError: (Object error) {
       _location.value = null;
@@ -179,8 +178,8 @@ class _LocationLayerState extends State<LocationLayer>
       _serviceStatus.value = LocationServiceStatus.unsubscribed;
     });
 
-    await _compassEventsSub?.cancel();
-    _compassEventsSub = FlutterCompass.events?.listen((CompassEvent event) {
+    await _controller.unsubscribeCompass();
+    _controller.subscribeCompass((CompassEvent event) {
       _heading.value = event.heading;
     });
 

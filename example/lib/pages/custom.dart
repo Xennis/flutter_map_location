@@ -12,7 +12,7 @@ class CustomPage extends StatefulWidget {
 }
 
 class _CustomPageState extends State<CustomPage> {
-  final MapController mapController = MapController();
+  final MapController _mapController = MapController();
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class _CustomPageState extends State<CustomPage> {
         drawer: buildDrawer(context, CustomPage.route),
         body: Center(
           child: FlutterMap(
-            mapController: mapController,
+            mapController: _mapController,
             options: MapOptions(
               plugins: <MapPlugin>[
                 LocationPlugin(),
@@ -47,7 +47,7 @@ class _CustomPageState extends State<CustomPage> {
                   if (ld == null) {
                     return;
                   }
-                  mapController.move(ld.location, 16.0);
+                  _mapController.move(ld.location, 16.0);
                 },
                 markerBuilder: (BuildContext context, LatLngData ld,
                     ValueNotifier<double?> heading) {
