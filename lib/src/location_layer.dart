@@ -41,7 +41,7 @@ class LocationLayer extends StatefulWidget {
 class _LocationLayerState extends State<LocationLayer>
     with WidgetsBindingObserver {
   final ValueNotifier<LocationServiceStatus> _serviceStatus =
-      ValueNotifier<LocationServiceStatus>(LocationServiceStatus.unkown);
+      ValueNotifier<LocationServiceStatus>(LocationServiceStatus.unknown);
   final ValueNotifier<LatLngData?> _location = ValueNotifier<LatLngData?>(null);
   final ValueNotifier<double?> _heading = ValueNotifier<double?>(null);
   late final LocationControllerImpl _controller;
@@ -79,12 +79,12 @@ class _LocationLayerState extends State<LocationLayer>
         if (_serviceStatus.value == LocationServiceStatus.subscribed) {
           _serviceStatus.value = LocationServiceStatus.paused;
         } else {
-          _serviceStatus.value = LocationServiceStatus.unkown;
+          _serviceStatus.value = LocationServiceStatus.unknown;
         }
         break;
       case AppLifecycleState.resumed:
         if (_serviceStatus.value == LocationServiceStatus.paused) {
-          _serviceStatus.value = LocationServiceStatus.unkown;
+          _serviceStatus.value = LocationServiceStatus.unknown;
           _initOnLocationUpdateSubscription();
         }
         break;
@@ -138,7 +138,7 @@ class _LocationLayerState extends State<LocationLayer>
     await _locationSub?.cancel();
     await _controller.unsubscribePosition();
     _locationSub = _controller
-        .subscribePosition(widget.options.updateInterval)
+        .subscribePosition(widget.options.updateInterval, widget.options.locationAccuracy)
         .listen((LatLngData loc) {
       _location.value = loc;
       widget.options.onLocationUpdate?.call(loc);

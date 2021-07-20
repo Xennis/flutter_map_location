@@ -4,9 +4,10 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_location/flutter_map_location.dart';
 import 'package:flutter_map_location/src/location_controller.dart';
 import 'package:flutter_map_location/src/types.dart';
+import 'package:geolocator/geolocator.dart';
 
 enum LocationServiceStatus {
-  unkown,
+  unknown,
   disabled,
   permissionDenied,
   subscribed,
@@ -27,6 +28,7 @@ class LocationOptions extends LayerOptions {
       this.markerBuilder,
       LocationController? controller,
       this.updateInterval = const Duration(seconds: 1),
+        this.locationAccuracy = LocationAccuracy.best,
       this.initiallyRequest = true})
       : controller = controller ?? LocationControllerImpl(),
         super();
@@ -39,5 +41,6 @@ class LocationOptions extends LayerOptions {
   final LocationButtonBuilder buttonBuilder;
   final LocationMarkerBuilder? markerBuilder;
   final Duration updateInterval;
+  final LocationAccuracy locationAccuracy;
   final bool initiallyRequest;
 }
