@@ -28,8 +28,8 @@ class LocationOptions extends LayerOptions {
       this.markerBuilder,
       LocationController? controller,
       this.updateInterval = const Duration(seconds: 1),
-        this.locationAccuracy = LocationAccuracy.best,
-      this.initiallyRequest = true})
+      this.initiallyRequest = true,
+      this.locationAccuracy = LocationAccuracy.best})
       : controller = controller ?? LocationControllerImpl(),
         super();
 
