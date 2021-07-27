@@ -55,11 +55,13 @@ class LocationControllerImpl implements LocationController {
     return Future<bool>.value(true);
   }
 
-  Stream<LatLngData> subscribePosition(Duration intervalDuration) {
+  Stream<LatLngData> subscribePosition(
+      Duration intervalDuration, LocationAccuracy locationAccuracy) {
     _isSubscribed = true;
-    _onLocationChangedSub =
-        Geolocator.getPositionStream(intervalDuration: intervalDuration).listen(
-            (Position ld) {
+    _onLocationChangedSub = Geolocator.getPositionStream(
+            intervalDuration: intervalDuration,
+            desiredAccuracy: locationAccuracy)
+        .listen((Position ld) {
       _controller
           .add(LatLngData(LatLng(ld.latitude, ld.longitude), ld.accuracy));
     }, onError: (Object error) {
