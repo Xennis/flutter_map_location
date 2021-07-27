@@ -138,7 +138,8 @@ class _LocationLayerState extends State<LocationLayer>
     await _locationSub?.cancel();
     await _controller.unsubscribePosition();
     _locationSub = _controller
-        .subscribePosition(widget.options.updateInterval, widget.options.locationAccuracy)
+        .subscribePosition(
+            widget.options.updateInterval, widget.options.locationAccuracy)
         .listen((LatLngData loc) {
       _location.value = loc;
       widget.options.onLocationUpdate?.call(loc);
