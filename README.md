@@ -1,3 +1,5 @@
+**The plugin is discontinued.** Feel free to fork it or checkout [similar plugins](https://flutter-map.vercel.app/plugins/list).
+
 # Flutter Map – Location plugin
 
 [![Flutter](https://github.com/Xennis/flutter_map_location/workflows/Flutter/badge.svg?branch=main&event=push)](https://github.com/Xennis/flutter_map_location/actions?query=workflow%3A%22Flutter%22+event%3Apush+branch%3Amain) [![Pub](https://img.shields.io/pub/v/flutter_map_location.svg)](https://pub.dev/packages/flutter_map_location)
